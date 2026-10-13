@@ -81,7 +81,7 @@
         </Grid.ColumnDefinitions>
 
         <!-- cancel button -->
-        <Button Grid.Column="5"
+        <Button Grid.Column="4"
                 Grid.ColumnSpan="2"
                 Content="Close"
                 Click="{e:EventBinding OnClosed}"
