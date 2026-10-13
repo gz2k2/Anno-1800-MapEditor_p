@@ -20,6 +20,7 @@ namespace AnnoMapEditor.UI.Controls.Slots
         public int AvailableMineSlots { get; }
         public int AvailableClaySlots { get; }
         public int AvailableOilSlots { get; }
+        public int AvailableOreTypes { get; }
 
 
         public SlotsViewModel(FixedIslandElement fixedIsland, RegionAsset region)
@@ -30,6 +31,17 @@ namespace AnnoMapEditor.UI.Controls.Slots
             AvailableMineSlots = CountSlots(SlotAsset.RANDOM_MINE);
             AvailableClaySlots = CountSlots(SlotAsset.RANDOM_CLAY);
             AvailableOilSlots = CountSlots(SlotAsset.RANDOM_OIL);
+            AvailableOreTypes = new[]
+                {
+                    SlotAsset.RandomMineOldWorld,
+                    SlotAsset.RandomMineNewWorld,
+                    SlotAsset.RandomMineArctic
+                }
+                .Where(slot => slot != null)
+                .SelectMany(slot => slot.ReplacementSlotAssets)
+                .Where(ore => ore.AssociatedRegions.Contains(Region))
+                .DistinctBy(ore => ore.GUID)
+                .Count();
 
             RefreshMineSlotCount();
         }

@@ -133,6 +133,11 @@
                 <StackPanel Visibility="{Binding SlotsAndFertilitiesVisible, Converter={StaticResource VisibleOnTrue}}">
                     <!-- Fertilities -->
                     <TextBlock Text="Fertilities" Style="{StaticResource SubHeaderLabelStyle}" />
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,4"
+                                TextElement.Foreground="{StaticResource ForegroundBrush}">
+                        <TextBlock Text="Available in region: " />
+                        <TextBlock Text="{Binding AvailableFertilitiesCount}" FontWeight="Bold" />
+                    </StackPanel>
                     
                     <ToggleButton Style="{StaticResource FancyToggleButton}" 
                                   Margin="0,0,0,4"

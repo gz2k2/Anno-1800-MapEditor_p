@@ -108,6 +108,9 @@ namespace AnnoMapEditor.UI.Controls.IslandProperties
             }
         }
         public ObservableCollection<SelectFertilityItem> FertilityItems { get; private set; } = new();
+        public int AvailableFertilitiesCount => MapTemplate.Session.Region.AllowedFertilities
+            .Distinct()
+            .Count();
         public bool SlotsAndFertilitiesVisible => (SelectedIsland is FixedIslandElement &&
                                                    (SelectedIsland.IslandType == IslandType.Normal ||
                                                     SelectedIsland.IslandType == IslandType.Starter));

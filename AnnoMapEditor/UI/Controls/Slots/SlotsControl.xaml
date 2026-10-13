@@ -36,7 +36,9 @@
             <TextBlock Text="Clay " />
             <TextBlock Text="{Binding AvailableClaySlots}" FontWeight="Bold" Margin="0,0,8,0" />
             <TextBlock Text="Oil " />
-            <TextBlock Text="{Binding AvailableOilSlots}" FontWeight="Bold" />
+            <TextBlock Text="{Binding AvailableOilSlots}" FontWeight="Bold" Margin="0,0,8,0" />
+            <TextBlock Text="Ore-Types " />
+            <TextBlock Text="{Binding AvailableOreTypes}" FontWeight="Bold" />
         </StackPanel>
 
         <controls:FancyToggle Label="Randomize" 
