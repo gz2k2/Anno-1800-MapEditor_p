@@ -18,8 +18,11 @@ namespace AnnoMapEditor.UI.Controls.IslandProperties
         static FertilityComparer()
         {
             int index = 0;
-            _orderLookup = MinimapSceneAsset.Instance.FertilityOrderGuids
-                .ToDictionary(f => f, f => index++);
+            // MinimapSceneAsset is loaded from the game's assets.xml. It is null in
+            // custom-island test mode, where fertility sorting must still be constructible.
+            _orderLookup = MinimapSceneAsset.Instance?.FertilityOrderGuids?
+                .ToDictionary(f => f, f => index++)
+                ?? new Dictionary<long, int>();
         }
 
 

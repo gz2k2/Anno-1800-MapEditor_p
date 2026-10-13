@@ -145,6 +145,7 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
         private static IEnumerable<SlotAsset> GetNewWorldOreOptions()
         {
             return new[] { SlotAsset.RandomMineOldWorld, SlotAsset.RandomMineNewWorld, SlotAsset.RandomMineArctic }
+                .Where(mineSlot => mineSlot != null)
                 .SelectMany(mineSlot => mineSlot.ReplacementSlotAssets)
                 .Where(slot => slot.GUID == GOLD_ORE_GUID || slot.AssociatedRegions.Contains(RegionAsset.SouthAmerica))
                 .DistinctBy(slot => slot.GUID);
@@ -178,13 +179,13 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
             {
                 long randomSlotGuid = SlotAssignment.Slot.ObjectGuid;
 
-                if (randomSlotGuid == SlotAsset.RandomMineOldWorld.GUID
-                    || randomSlotGuid == SlotAsset.RandomMineNewWorld.GUID
-                    || randomSlotGuid == SlotAsset.RandomMineArctic.GUID)
+                if (randomSlotGuid == SlotAsset.RANDOM_MINE_OLD_WORLD_GUID
+                    || randomSlotGuid == SlotAsset.RANDOM_MINE_NEW_WORLD_GUID
+                    || randomSlotGuid == SlotAsset.RANDOM_MINE_ARCTIC_GUID)
                     PinBrush = Brushes.Gray;
-                else if (randomSlotGuid == SlotAsset.RandomClay.GUID)
+                else if (randomSlotGuid == SlotAsset.RANDOM_CLAY_GUID)
                     PinBrush = Brushes.Orange;
-                else if (randomSlotGuid == SlotAsset.RandomOil.GUID)
+                else if (randomSlotGuid == SlotAsset.RANDOM_OIL_GUID)
                     PinBrush = Brushes.Blue;
                 else
                     PinBrush = Brushes.Red;

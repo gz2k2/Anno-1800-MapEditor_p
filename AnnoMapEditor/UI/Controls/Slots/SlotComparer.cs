@@ -18,8 +18,11 @@ namespace AnnoMapEditor.UI.Controls.Slots
         static SlotComparer()
         {
             int index = 0;
-            _orderLookup = MinimapSceneAsset.Instance.LodesOrderSlotTypes
-                .ToDictionary(f => f, f => index++);
+            // MinimapSceneAsset is loaded from the game's assets.xml. It is intentionally null
+            // in custom-island test mode, where slots still need to be displayed and counted.
+            _orderLookup = MinimapSceneAsset.Instance?.LodesOrderSlotTypes?
+                .ToDictionary(f => f, f => index++)
+                ?? new Dictionary<string, int>();
         }
 
 

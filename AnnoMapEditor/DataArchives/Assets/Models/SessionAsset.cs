@@ -68,6 +68,23 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
         [GuidReference(nameof(RegionGuid))]
         public RegionAsset Region { get; set; }
 
+        private SessionAsset()
+        {
+            DisplayName = "Custom-island test session";
+            Region = RegionAsset.CreateTestRegion();
+        }
+
+        /// <summary>Minimal session used when running without the game's assets.</summary>
+        public static SessionAsset CreateTestSession()
+        {
+            return new()
+            {
+                GUID = SESSION_OLDWORLD_GUID,
+                DisplayName = "Custom-island test session",
+                Region = RegionAsset.CreateTestRegion()
+            };
+        }
+
 
         public SessionAsset(XElement valuesXml)
             : base(valuesXml)

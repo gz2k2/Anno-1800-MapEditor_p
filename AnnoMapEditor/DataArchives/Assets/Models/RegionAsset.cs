@@ -63,6 +63,30 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
         [GuidReference(nameof(AllowedFertilityGuids))]
         public ICollection<FertilityAsset> AllowedFertilities { get; init; }
 
+        private RegionAsset()
+        {
+            DisplayName = "Test region";
+            RegionID = REGION_MODERATE_REGIONID;
+            AllowedFertilityGuids = Array.Empty<long>();
+            AllowedFertilities = Array.Empty<FertilityAsset>();
+        }
+
+        /// <summary>
+        /// Minimal region used by the custom-island test mode when the game's assets.xml is not
+        /// available. It intentionally contains no fertility data.
+        /// </summary>
+        public static RegionAsset CreateTestRegion()
+        {
+            return new()
+            {
+                GUID = REGION_MODERATE_GUID,
+                DisplayName = "Test region",
+                RegionID = REGION_MODERATE_REGIONID,
+                AllowedFertilityGuids = Array.Empty<long>(),
+                AllowedFertilities = Array.Empty<FertilityAsset>()
+            };
+        }
+
 
         public RegionAsset(XElement valuesXml)
             : base(valuesXml)

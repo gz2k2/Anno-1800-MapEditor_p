@@ -96,7 +96,7 @@
                   SelectedItem="{Binding SelectedRegion}"/>
         <controls:FancyToggle x:Name="MinesFilter"
                               Grid.Row="1"
-                              Grid.Column="1"
+                              Grid.Column="0"
                               Label="Mines" 
                               OnText="Show" OffText="Hide" 
                               IsChecked="{Binding ShowMines, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -104,7 +104,7 @@
                               VerticalAlignment="Center"/>
         <controls:FancyToggle x:Name="ClayFilter"
                               Grid.Row="1"
-                              Grid.Column="2"
+                              Grid.Column="1"
                               Label="Clay" 
                               OnText="Show" OffText="Hide" 
                               IsChecked="{Binding ShowClay, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -112,7 +112,7 @@
                               VerticalAlignment="Center"/>
         <controls:FancyToggle x:Name="OilFilter"
                               Grid.Row="1"
-                              Grid.Column="3"
+                              Grid.Column="2"
                               Label="Oil" 
                               OnText="Show" OffText="Hide" 
                               IsChecked="{Binding ShowOil, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"

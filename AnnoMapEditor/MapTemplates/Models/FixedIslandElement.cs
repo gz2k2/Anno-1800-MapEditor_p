@@ -1,5 +1,6 @@
 ﻿using Anno.FileDBModels.Anno1800.MapTemplate;
 using AnnoMapEditor.DataArchives;
+using AnnoMapEditor.DataArchives.Assets;
 using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.DataArchives.Assets.Repositories;
 using AnnoMapEditor.MapTemplates.Enums;
@@ -124,26 +125,33 @@ namespace AnnoMapEditor.MapTemplates.Models
             string islandFilePath = sourceElement.MapFilePath
                 ?? throw new ArgumentException($"Missing property '{nameof(Element.MapFilePath)}'.");
 
-            IslandRepository islandRepository = DataManager.Instance.IslandRepository;
+            IslandAsset? islandAsset = CustomIslandCatalog.Instance.Islands
+                .FirstOrDefault(i => i.FilePath == islandFilePath);
 
-            if (!islandRepository.TryGetByFilePath(islandFilePath, out var islandAsset))
+            if (islandAsset == null && DataManager.Instance.IsInitialized
+                && DataManager.Instance.IslandRepository.TryGetByFilePath(islandFilePath, out IslandAsset? repositoryIsland))
+                islandAsset = repositoryIsland;
+
+            if (islandAsset == null)
                 throw new NullReferenceException($"Unknown island '{islandFilePath}'.");
 
             IslandAsset = islandAsset;
             //Rotation is not asset bound, thus loaded in constructor
 
-            AssetRepository assetRepository = DataManager.Instance.AssetRepository;
+            AssetRepository? assetRepository = DataManager.Instance.IsInitialized
+                ? DataManager.Instance.AssetRepository
+                : null;
 
             // fertilities
             //  _randomizeFertilities is loaded in constructor.
-            if (sourceElement.FertilityGuids != null)
+            if (sourceElement.FertilityGuids != null && assetRepository != null)
             {
                 foreach (int guid in sourceElement.FertilityGuids)
                 {
                     if (assetRepository.TryGet(guid, out FertilityAsset? fertility) && fertility != null)
                         Fertilities.Add(fertility);
                     else
-                        throw new Exception($"Unrecognized {nameof(FertilityAsset)} for GUID {guid}.");
+                        _logger.LogWarning($"Unrecognized {nameof(FertilityAsset)} for GUID {guid}; game data is unavailable.");
                 }
             }
 
@@ -166,7 +174,7 @@ namespace AnnoMapEditor.MapTemplates.Models
                     if (slotGuid == 0)
                         slotAsset = null;
 
-                    else if (!assetRepository.TryGet(slotGuid, out slotAsset))
+                    else if (assetRepository == null || !assetRepository.TryGet(slotGuid, out slotAsset))
                     {
                         _logger.LogWarning($"Unrecognized {nameof(SlotAsset)} GUID {slotGuid} on instance of '{islandFilePath}'. The slot will be skipped and the map may be corrupted.");
                         continue;

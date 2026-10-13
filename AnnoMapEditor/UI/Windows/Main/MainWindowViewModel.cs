@@ -37,6 +37,9 @@ namespace AnnoMapEditor.UI.Windows.Main
             get => _mapTemplate;
             private set
             {
+                if (!DataManager.IsInitialized && value.Session == null)
+                    value.Session = SessionAsset.CreateTestSession();
+
                 if (value != _mapTemplate)
                 {
                     SetProperty(ref _mapTemplate, value);
@@ -152,13 +155,14 @@ namespace AnnoMapEditor.UI.Windows.Main
 
         private void CommonConstructor()
         {
+            _ = CustomIslandCatalog.Instance.RefreshAsync();
+
             if (DataManager.IsInitialized)
             {
                 Status = $"Game Path: {Settings.Instance.GamePath}";
-                _ = CustomIslandCatalog.Instance.RefreshAsync();
             }
             else
-                Status = "Game files are not loaded. Island placement is unavailable.";
+                Status = "Game files are not loaded. Custom islands are available, but built-in islands are unavailable.";
             
             MapTemplate.ShowLabels = true;
             
@@ -382,15 +386,27 @@ namespace AnnoMapEditor.UI.Windows.Main
 
         private void AddCustomIsland(IslandAsset island)
         {
-            IslandType islandType = island.IslandType.FirstOrDefault() ?? IslandType.Normal;
-            FixedIslandElement element = new(island, islandType)
+            try
             {
-                Label = island.DisplayName,
-                Position = new((MapTemplate.Size.X - island.SizeInTiles) / 2, (MapTemplate.Size.Y - island.SizeInTiles) / 2)
-            };
-            MapTemplate.Elements.Add(element);
-            UndoRedoStack.Instance.Do(new IslandAddStackEntry(element, MapTemplate));
-            SelectedIsland = element;
+                IslandType islandType = island.IslandType.FirstOrDefault() ?? IslandType.Normal;
+                FixedIslandElement element = new(island, islandType)
+                {
+                    Label = island.DisplayName,
+                    Position = new((MapTemplate.Size.X - island.SizeInTiles) / 2, (MapTemplate.Size.Y - island.SizeInTiles) / 2)
+                };
+                MapTemplate.Elements.Add(element);
+                UndoRedoStack.Instance.Do(new IslandAddStackEntry(element, MapTemplate));
+                SelectedIsland = element;
+            }
+            catch (Exception ex)
+            {
+                DataManager._logger.LogError($"Could not add custom island '{island.DisplayName}'.", ex);
+                System.Windows.MessageBox.Show(
+                    $"The custom island could not be added.\n\n{ex.Message}",
+                    "Custom island test mode",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Error);
+            }
         }
 
         public async void OpenMapFileDialog()

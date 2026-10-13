@@ -23,7 +23,7 @@ namespace AnnoMapEditor.DataArchives.Assets
         {
             Islands.Clear();
             string? root = Settings.Instance.CustomIslandsPath;
-            if (string.IsNullOrWhiteSpace(root) || !Directory.Exists(root) || !DataManager.Instance.IsInitialized)
+            if (string.IsNullOrWhiteSpace(root) || !Directory.Exists(root))
                 return;
 
             // Search recursively: creators commonly group islands by region or author below the
@@ -45,6 +45,23 @@ namespace AnnoMapEditor.DataArchives.Assets
                     string relativeA7m = Path.GetRelativePath(root, a7m);
                     FixedIslandRepository reader = new(new FolderDataArchive(root));
                     FixedIslandAsset fixedIsland = await reader.LoadIslandAssetAsync(relativeA7m);
+
+                    // Slot assets normally come from assets.xml. Keep the slot geometry usable
+                    // in custom-only mode by creating lightweight placeholders when the game
+                    // archives are not available. Their GUIDs are enough for displaying and
+                    // exporting the discovered slots; replacement options require game data.
+                    if (!DataManager.Instance.IsInitialized)
+                    {
+                        foreach (Slot slot in fixedIsland.Slots.Values)
+                        {
+                            slot.SlotAsset ??= new SlotAsset
+                            {
+                                GUID = slot.ObjectGuid,
+                                DisplayName = $"Slot {slot.ObjectGuid}"
+                            };
+                        }
+                    }
+
                     string relativeDirectory = Path.GetRelativePath(root, directory);
                     string virtualPath = Path.Combine("data", "ame", "sessions", "islands", "pool", "custom", relativeDirectory, name + ".a7m");
                     IslandAsset island = new()
@@ -53,7 +70,7 @@ namespace AnnoMapEditor.DataArchives.Assets
                         CustomSourceDirectory = directory,
                         DisplayName = name,
                         Thumbnail = fixedIsland.Thumbnail,
-                        Region = RegionAsset.DetectFromPath(name),
+                        Region = RegionAsset.DetectFromPath(name) ?? RegionAsset.CreateTestRegion(),
                         IslandDifficulty = new[] { IslandDifficulty.Normal },
                         IslandType = new[] { IslandType.Normal },
                         IslandSize = new[] { IslandSize.All.FirstOrDefault(s => fixedIsland.SizeInTiles <= s.DefaultSizeInTiles)! },
@@ -61,7 +78,10 @@ namespace AnnoMapEditor.DataArchives.Assets
                         Slots = fixedIsland.Slots
                     };
                     Islands.Add(island);
-                    DataManager.Instance.IslandRepository.AddCustomIsland(island);
+                    // The catalog also works without the game's RDA files. In that mode there
+                    // is no initialized IslandRepository to update; consumers use this catalog.
+                    if (DataManager.Instance.IsInitialized)
+                        DataManager.Instance.IslandRepository.AddCustomIsland(island);
                 }
                 catch (Exception ex)
                 {
