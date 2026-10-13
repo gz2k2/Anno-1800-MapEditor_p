@@ -88,6 +88,28 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
         }
         private bool _newWorldAllOres;
 
+        public bool OldWorldAllOres
+        {
+            get => _oldWorldAllOres;
+            set
+            {
+                SetProperty(ref _oldWorldAllOres, value);
+                UpdateFilter();
+            }
+        }
+        private bool _oldWorldAllOres;
+
+        public bool ArcticAllOres
+        {
+            get => _arcticAllOres;
+            set
+            {
+                SetProperty(ref _arcticAllOres, value);
+                UpdateFilter();
+            }
+        }
+        private bool _arcticAllOres;
+
 
         public SlotAssignmentViewModel(SlotAssignment slotAssignment, RegionAsset selectedRegion)
         {
@@ -97,7 +119,11 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
             ICollection<SlotAsset> originalSlotItems = slotAssignment.Slot.SlotAsset!.ReplacementSlotAssets;
             _originalSlotItems = new(originalSlotItems);
 
-            IEnumerable<SlotAsset> additionalOptions = IsMineSlot ? GetNewWorldOreOptions() : Enumerable.Empty<SlotAsset>();
+            IEnumerable<SlotAsset> additionalOptions = IsMineSlot
+                ? GetOreOptions(RegionAsset.SouthAmerica)
+                    .Concat(GetOreOptions(RegionAsset.Moderate))
+                    .Concat(GetOreOptions(RegionAsset.Arctic))
+                : Enumerable.Empty<SlotAsset>();
             SlotItems = new(originalSlotItems.Concat(additionalOptions).Distinct());
             SlotItems.Add(EmptySlot);
 
@@ -118,6 +144,12 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
 
             if (NewWorldAllOres && _selectedRegion == RegionAsset.SouthAmerica && IsMineSlot)
                 return slotAsset.GUID == GOLD_ORE_GUID || slotAsset.AssociatedRegions.Contains(RegionAsset.SouthAmerica);
+
+            if (OldWorldAllOres && _selectedRegion == RegionAsset.Moderate && IsMineSlot)
+                return slotAsset.AssociatedRegions.Contains(RegionAsset.Moderate);
+
+            if (ArcticAllOres && _selectedRegion == RegionAsset.Arctic && IsMineSlot)
+                return slotAsset.AssociatedRegions.Contains(RegionAsset.Arctic);
 
             if (!_originalSlotItems.Contains(slotAsset))
                 return false;
@@ -142,12 +174,13 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
             || SlotAssignment.Slot.ObjectGuid == SlotAsset.RANDOM_MINE_NEW_WORLD_GUID
             || SlotAssignment.Slot.ObjectGuid == SlotAsset.RANDOM_MINE_ARCTIC_GUID;
 
-        private static IEnumerable<SlotAsset> GetNewWorldOreOptions()
+        private static IEnumerable<SlotAsset> GetOreOptions(RegionAsset region)
         {
             return new[] { SlotAsset.RandomMineOldWorld, SlotAsset.RandomMineNewWorld, SlotAsset.RandomMineArctic }
                 .Where(mineSlot => mineSlot != null)
                 .SelectMany(mineSlot => mineSlot.ReplacementSlotAssets)
-                .Where(slot => slot.GUID == GOLD_ORE_GUID || slot.AssociatedRegions.Contains(RegionAsset.SouthAmerica))
+                .Where(slot => slot.AssociatedRegions.Contains(region)
+                    || (region == RegionAsset.SouthAmerica && slot.GUID == GOLD_ORE_GUID))
                 .DistinctBy(slot => slot.GUID);
         }
 

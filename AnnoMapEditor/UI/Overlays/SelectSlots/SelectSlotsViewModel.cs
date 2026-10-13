@@ -89,11 +89,17 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
 
                 ShowRegionWarning = _selectedRegion != _initialRegion;
                 OnPropertyChanged(nameof(ShowNewWorldAllOres));
+                OnPropertyChanged(nameof(ShowOldWorldAllOres));
+                OnPropertyChanged(nameof(ShowArcticAllOres));
             }
         }
         private RegionAsset _selectedRegion;
 
         public bool ShowNewWorldAllOres => SelectedRegion == RegionAsset.SouthAmerica;
+
+        public bool ShowOldWorldAllOres => SelectedRegion == RegionAsset.Moderate;
+
+        public bool ShowArcticAllOres => SelectedRegion == RegionAsset.Arctic;
 
         public bool ShowRegionWarning
         {
@@ -159,6 +165,30 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
             }
         }
         private bool _newWorldAllOres;
+
+        public bool OldWorldAllOres
+        {
+            get => _oldWorldAllOres;
+            set
+            {
+                SetProperty(ref _oldWorldAllOres, value);
+                foreach (SlotAssignmentViewModel slotAssignment in SlotAssignmentViewModels)
+                    slotAssignment.OldWorldAllOres = value;
+            }
+        }
+        private bool _oldWorldAllOres;
+
+        public bool ArcticAllOres
+        {
+            get => _arcticAllOres;
+            set
+            {
+                SetProperty(ref _arcticAllOres, value);
+                foreach (SlotAssignmentViewModel slotAssignment in SlotAssignmentViewModels)
+                    slotAssignment.ArcticAllOres = value;
+            }
+        }
+        private bool _arcticAllOres;
 
         public ObservableCollection<SlotAssignmentViewModel> SlotAssignmentViewModels { get; init; }
         public IEnumerable<SlotAssignmentViewModel> SlotAssignmentViewModelsLeft { get; private set; }

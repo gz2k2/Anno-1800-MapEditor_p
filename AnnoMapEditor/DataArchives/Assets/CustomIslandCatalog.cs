@@ -17,7 +17,18 @@ namespace AnnoMapEditor.DataArchives.Assets
 
         public ObservableCollection<IslandAsset> Islands { get; } = new();
 
-        private CustomIslandCatalog() { }
+        private CustomIslandCatalog()
+        {
+            // A custom-island scan can run while the game data is still loading (in
+            // particular when starting the published application). Scan again once assets.xml
+            // is available so the slots get their real SlotAsset, including its replacement
+            // choices for the slot configuration combo boxes.
+            DataManager.Instance.PropertyChanged += async (_, e) =>
+            {
+                if (e.PropertyName == nameof(DataManager.IsInitialized) && DataManager.Instance.IsInitialized)
+                    await RefreshAsync();
+            };
+        }
 
         public async Task RefreshAsync()
         {
@@ -46,15 +57,25 @@ namespace AnnoMapEditor.DataArchives.Assets
                     FixedIslandRepository reader = new(new FolderDataArchive(root));
                     FixedIslandAsset fixedIsland = await reader.LoadIslandAssetAsync(relativeA7m);
 
-                    // Slot assets normally come from assets.xml. Keep the slot geometry usable
-                    // in custom-only mode by creating lightweight placeholders when the game
-                    // archives are not available. Their GUIDs are enough for displaying and
-                    // exporting the discovered slots; replacement options require game data.
-                    if (!DataManager.Instance.IsInitialized)
+                    // Resolve the slot GUIDs just like IslandRepository does for built-in
+                    // islands. Without this, custom islands have visible slot geometry but no
+                    // SlotAsset and therefore no entries in the slot configuration UI.
+                    AssetRepository? assetRepository = DataManager.Instance.IsInitialized
+                        ? DataManager.Instance.AssetRepository
+                        : null;
+                    foreach (Slot slot in fixedIsland.Slots.Values)
                     {
-                        foreach (Slot slot in fixedIsland.Slots.Values)
+                        if (assetRepository != null
+                            && assetRepository.TryGet(slot.ObjectGuid, out SlotAsset? slotAsset))
                         {
-                            slot.SlotAsset ??= new SlotAsset
+                            slot.SlotAsset = slotAsset;
+                        }
+                        else
+                        {
+                            // Keep the slot geometry usable without game archives. A later
+                            // refresh after initialization replaces this placeholder with the
+                            // real asset and its replacement choices.
+                            slot.SlotAsset = new SlotAsset
                             {
                                 GUID = slot.ObjectGuid,
                                 DisplayName = $"Slot {slot.ObjectGuid}"

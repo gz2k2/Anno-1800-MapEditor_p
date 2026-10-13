@@ -134,6 +134,22 @@
                               Visibility="{Binding ShowNewWorldAllOres, Converter={StaticResource boolToVisibility}}"
                               HorizontalAlignment="Center"
                               VerticalAlignment="Center"/>
+        <controls:FancyToggle Grid.Row="0"
+                              Grid.Column="1"
+                              Label="Old World all Ores"
+                              OnText="On" OffText="Off"
+                              IsChecked="{Binding OldWorldAllOres, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              Visibility="{Binding ShowOldWorldAllOres, Converter={StaticResource boolToVisibility}}"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center"/>
+        <controls:FancyToggle Grid.Row="0"
+                              Grid.Column="1"
+                              Label="Arctic all Ores"
+                              OnText="On" OffText="Off"
+                              IsChecked="{Binding ArcticAllOres, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              Visibility="{Binding ShowArcticAllOres, Converter={StaticResource boolToVisibility}}"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center"/>
 
         <!-- region warning -->
         <DockPanel Grid.Row="2"
