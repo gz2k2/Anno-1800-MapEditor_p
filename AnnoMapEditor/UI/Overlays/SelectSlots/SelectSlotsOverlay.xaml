@@ -81,7 +81,7 @@
         </Grid.ColumnDefinitions>
 
         <!-- cancel button -->
-        <Button Grid.Column="3"
+        <Button Grid.Column="5"
                 Grid.ColumnSpan="2"
                 Content="Close"
                 Click="{e:EventBinding OnClosed}"
@@ -121,7 +121,7 @@
         <controls:FancyToggle x:Name="CustomFilter"
                               Grid.Row="1"
                               Grid.Column="3"
-                              Label="Custom"
+                              Label="Unknown"
                               OnText="Show" OffText="Hide"
                               IsChecked="{Binding ShowCustom, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                               HorizontalAlignment="Center"

@@ -153,6 +153,33 @@
                             TextWrapping="Wrap"
                             Text="Some selected fertilities are not allowed by default in the currently selected region."></TextBlock>
                     </Border>
+
+                    <Border Visibility="{Binding ForeignRegionRandomFertilitiesWarning, Converter={StaticResource VisibleOnTrue}}"
+                            Margin="0,4" Padding="10,5" CornerRadius="5"
+                            Background="{StaticResource WarningBackgroundBrush}">
+                        <StackPanel>
+                            <TextBlock Foreground="{StaticResource MediumBackgroundBrush}" TextWrapping="Wrap"
+                                       Text="The game may not generate fertilities for an island from another region." />
+                            <ToggleButton Style="{StaticResource FancyToggleButton}" Margin="0,6,0,0"
+                                          IsChecked="{Binding AppRandomizeFertilities}">
+                                <TextBlock Margin="5,0" Text="App randomizes fertilities" />
+                            </ToggleButton>
+                            <Grid Margin="0,6,0,0" Visibility="{Binding AppRandomizeFertilities, Converter={StaticResource VisibleOnTrue}}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Margin="0,0,4,0">
+                                    <TextBlock Text="Min fertilities" />
+                                    <TextBox Text="{Binding AppRandomFertilitiesMin, UpdateSourceTrigger=PropertyChanged}" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Margin="4,0,0,0">
+                                    <TextBlock Text="Max fertilities" />
+                                    <TextBox Text="{Binding AppRandomFertilitiesMax, UpdateSourceTrigger=PropertyChanged}" />
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
                     
                     <ItemsControl ItemsSource="{Binding FertilityItems}"
                                   Visibility="{Binding RandomizeFertilities, Converter={StaticResource VisibleOnFalse}}">

@@ -205,7 +205,10 @@ namespace AnnoMapEditor.MapTemplates.Models
             if (_templateDocument.MapTemplate?.Size is null || _templateDocument.MapTemplate?.PlayableArea is null)
                 return null;
 
-            _templateDocument.MapTemplate.TemplateElement = new List<TemplateElement>(Elements.Select(x => x.ToTemplate()).Where(x => x is not null)!);
+            _templateDocument.MapTemplate.TemplateElement = new List<TemplateElement>(Elements
+                .Select(element => element is FixedIslandElement fixedIsland
+                    ? fixedIsland.ToTemplate(Session.Region)
+                    : element.ToTemplate()));
             _templateDocument.MapTemplate.ElementCount = _templateDocument.MapTemplate.TemplateElement.Count;
 
             if (Session == SessionAsset.NewWorld)

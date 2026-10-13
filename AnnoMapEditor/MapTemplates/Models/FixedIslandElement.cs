@@ -66,6 +66,31 @@ namespace AnnoMapEditor.MapTemplates.Models
 
         public ObservableCollection<FertilityAsset> Fertilities { get; init; } = new();
 
+        /// <summary>
+        /// Uses the editor to choose fertilities when the game's generator cannot do so for a
+        /// fixed island from another region.
+        /// </summary>
+        public bool AppRandomizeFertilities
+        {
+            get => _appRandomizeFertilities;
+            set => SetProperty(ref _appRandomizeFertilities, value);
+        }
+        private bool _appRandomizeFertilities;
+
+        public int AppRandomFertilitiesMin
+        {
+            get => _appRandomFertilitiesMin;
+            set => SetProperty(ref _appRandomFertilitiesMin, Math.Max(0, value));
+        }
+        private int _appRandomFertilitiesMin = 1;
+
+        public int AppRandomFertilitiesMax
+        {
+            get => _appRandomFertilitiesMax;
+            set => SetProperty(ref _appRandomFertilitiesMax, Math.Max(0, value));
+        }
+        private int _appRandomFertilitiesMax = 3;
+
         public bool RandomizeSlots
         {
             get => _randomizeSlots;
@@ -293,6 +318,33 @@ namespace AnnoMapEditor.MapTemplates.Models
                     Difficulty = new() { id = IslandDifficulty?.ElementValue }
                 }
             };
+        }
+
+        /// <summary>
+        /// Serializes this island with access to the map region. This is required for the
+        /// editor-side fertility fallback used by islands from a different region.
+        /// </summary>
+        public TemplateElement ToTemplate(RegionAsset mapRegion)
+        {
+            TemplateElement templateElement = base.ToTemplate();
+
+            if (!AppRandomizeFertilities || !_randomizeFertilities || IslandAsset.Region.GUID == mapRegion.GUID)
+                return templateElement;
+
+            List<FertilityAsset> candidates = mapRegion.AllowedFertilities.Distinct().ToList();
+            int minimum = Math.Min(AppRandomFertilitiesMin, candidates.Count);
+            int maximum = Math.Clamp(AppRandomFertilitiesMax, minimum, candidates.Count);
+            int count = Random.Shared.Next(minimum, maximum + 1);
+
+            int[] fertilityGuids = candidates
+                .OrderBy(_ => Random.Shared.Next())
+                .Take(count)
+                .Select(fertility => (int)fertility.GUID)
+                .ToArray();
+
+            templateElement.Element!.RandomizeFertilities = false;
+            templateElement.Element.FertilityGuids = fertilityGuids;
+            return templateElement;
         }
     }
 }

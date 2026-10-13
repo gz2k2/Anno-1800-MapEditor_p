@@ -113,6 +113,39 @@ namespace AnnoMapEditor.UI.Controls.IslandProperties
                                                     SelectedIsland.IslandType == IslandType.Starter));
         public bool AllowedFertilitiesWarning => FertilityItems.Any(f => f is { IsAllowed: false, IsSelected: true })
                                                  && !RandomizeFertilities;
+        public bool ForeignRegionRandomFertilitiesWarning => SelectedIsland is FixedIslandElement fixedIsland
+            && fixedIsland.IslandAsset.Region.GUID != MapTemplate.Session.Region.GUID
+            && RandomizeFertilities;
+        public bool AppRandomizeFertilities
+        {
+            get => (SelectedIsland as FixedIslandElement)?.AppRandomizeFertilities ?? false;
+            set
+            {
+                if (SelectedIsland is FixedIslandElement fixedIsland)
+                    fixedIsland.AppRandomizeFertilities = value;
+                OnPropertyChanged();
+            }
+        }
+        public int AppRandomFertilitiesMin
+        {
+            get => (SelectedIsland as FixedIslandElement)?.AppRandomFertilitiesMin ?? 0;
+            set
+            {
+                if (SelectedIsland is FixedIslandElement fixedIsland)
+                    fixedIsland.AppRandomFertilitiesMin = value;
+                OnPropertyChanged();
+            }
+        }
+        public int AppRandomFertilitiesMax
+        {
+            get => (SelectedIsland as FixedIslandElement)?.AppRandomFertilitiesMax ?? 0;
+            set
+            {
+                if (SelectedIsland is FixedIslandElement fixedIsland)
+                    fixedIsland.AppRandomFertilitiesMax = value;
+                OnPropertyChanged();
+            }
+        }
         public SlotsViewModel? SlotsViewModel { get; private set; }
 
         private void ToolbarService_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -257,6 +290,16 @@ namespace AnnoMapEditor.UI.Controls.IslandProperties
             {
                 case nameof(FixedIslandElement.RandomizeFertilities):
                     OnPropertyChanged(nameof(RandomizeFertilities));
+                    OnPropertyChanged(nameof(ForeignRegionRandomFertilitiesWarning));
+                    break;
+                case nameof(FixedIslandElement.AppRandomizeFertilities):
+                    OnPropertyChanged(nameof(AppRandomizeFertilities));
+                    break;
+                case nameof(FixedIslandElement.AppRandomFertilitiesMin):
+                    OnPropertyChanged(nameof(AppRandomFertilitiesMin));
+                    break;
+                case nameof(FixedIslandElement.AppRandomFertilitiesMax):
+                    OnPropertyChanged(nameof(AppRandomFertilitiesMax));
                     break;
                 case nameof(FixedIslandElement.RandomizeRotation):
                     OnPropertyChanged(nameof(RandomizeRotation));
@@ -287,6 +330,7 @@ namespace AnnoMapEditor.UI.Controls.IslandProperties
             {
                 FertilityItems.Clear();
                 UpdateSelectedFertilities(); 
+                OnPropertyChanged(nameof(ForeignRegionRandomFertilitiesWarning));
             }
         }
 
