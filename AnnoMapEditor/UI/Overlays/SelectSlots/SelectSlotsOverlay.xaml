@@ -118,6 +118,14 @@
                               IsChecked="{Binding ShowOil, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                               HorizontalAlignment="Center"
                               VerticalAlignment="Center"/>
+        <controls:FancyToggle x:Name="CustomFilter"
+                              Grid.Row="1"
+                              Grid.Column="3"
+                              Label="Custom"
+                              OnText="Show" OffText="Hide"
+                              IsChecked="{Binding ShowCustom, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center"/>
                 <controls:FancyToggle Grid.Row="0"
                               Grid.Column="1"
                               Label="New World all Ores"

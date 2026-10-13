@@ -18,6 +18,22 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
         public const long RANDOM_CLAY_GUID = 100417;
         public const long RANDOM_OIL_GUID = 100849;
 
+        public const string RANDOM_MINE = "RANDOM_MINE";
+        public const string RANDOM_CLAY = "RANDOM_CLAY";
+        public const string RANDOM_OIL = "RANDOM_OIL";
+        public const string RANDOM_CUSTOM = "RANDOM_CUSTOM";
+
+        public static string GetRandomSlotType(long slotGuid)
+        {
+            return slotGuid switch
+            {
+                RANDOM_MINE_OLD_WORLD_GUID or RANDOM_MINE_NEW_WORLD_GUID or RANDOM_MINE_ARCTIC_GUID => RANDOM_MINE,
+                RANDOM_CLAY_GUID => RANDOM_CLAY,
+                RANDOM_OIL_GUID => RANDOM_OIL,
+                _ => RANDOM_CUSTOM
+            };
+        }
+
 
         [StaticAsset(RANDOM_MINE_OLD_WORLD_GUID)]
         public static SlotAsset RandomMineOldWorld { get; private set; }

@@ -187,7 +187,7 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
                     PinBrush = Brushes.Orange;
                 else if (randomSlotGuid == SlotAsset.RANDOM_OIL_GUID)
                     PinBrush = Brushes.Blue;
-                else
+                else if (SlotAsset.GetRandomSlotType(randomSlotGuid) == SlotAsset.RANDOM_CUSTOM)
                     PinBrush = Brushes.Red;
 
                 BackgroundBrush = PinBrush;

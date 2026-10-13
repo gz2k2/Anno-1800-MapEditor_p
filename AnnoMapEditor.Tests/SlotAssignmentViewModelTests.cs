@@ -10,6 +10,16 @@ namespace AnnoMapEditor.Tests;
 public class SlotAssignmentViewModelTests
 {
     [Theory]
+    [InlineData(987654321, SlotAsset.RANDOM_CUSTOM)]
+    [InlineData(SlotAsset.RANDOM_MINE_OLD_WORLD_GUID, SlotAsset.RANDOM_MINE)]
+    [InlineData(SlotAsset.RANDOM_CLAY_GUID, SlotAsset.RANDOM_CLAY)]
+    [InlineData(SlotAsset.RANDOM_OIL_GUID, SlotAsset.RANDOM_OIL)]
+    public void RandomSlotTypeClassifiesUnknownGuidsAsCustom(long guid, string expectedType)
+    {
+        Assert.Equal(expectedType, SlotAsset.GetRandomSlotType(guid));
+    }
+
+    [Theory]
     [InlineData(SlotAsset.RANDOM_MINE_NEW_WORLD_GUID, 0x808080)]
     [InlineData(SlotAsset.RANDOM_CLAY_GUID, 0xFFA500)]
     [InlineData(SlotAsset.RANDOM_OIL_GUID, 0xADD8E6)]

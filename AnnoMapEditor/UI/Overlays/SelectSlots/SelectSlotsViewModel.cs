@@ -137,6 +137,17 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
         }
         private bool _showOil = true;
 
+        public bool ShowCustom
+        {
+            get => _showCustom;
+            set
+            {
+                SetProperty(ref _showCustom, value);
+                UpdateFilter();
+            }
+        }
+        private bool _showCustom = true;
+
         public bool NewWorldAllOres
         {
             get => _newWorldAllOres;
@@ -212,17 +223,18 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
                 throw new ArgumentException();
 
             long slotGroupId = slotAssignment.SlotAssignment.Slot.ObjectGuid;
+            string slotType = SlotAsset.GetRandomSlotType(slotGroupId);
 
-            if (!ShowMines && (
-                  slotGroupId == SlotAsset.RANDOM_MINE_OLD_WORLD_GUID
-               || slotGroupId == SlotAsset.RANDOM_MINE_NEW_WORLD_GUID
-               || slotGroupId == SlotAsset.RANDOM_MINE_ARCTIC_GUID))
+            if (!ShowMines && slotType == SlotAsset.RANDOM_MINE)
                 return false;
 
-            if (!ShowClay && slotGroupId == SlotAsset.RANDOM_CLAY_GUID)
+            if (!ShowClay && slotType == SlotAsset.RANDOM_CLAY)
                 return false;
 
-            if (!ShowOil && slotGroupId == SlotAsset.RANDOM_OIL_GUID)
+            if (!ShowOil && slotType == SlotAsset.RANDOM_OIL)
+                return false;
+
+            if (!ShowCustom && slotType == SlotAsset.RANDOM_CUSTOM)
                 return false;
 
             return true;
