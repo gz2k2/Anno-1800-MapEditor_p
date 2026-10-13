@@ -226,6 +226,46 @@
                     </ItemsControl>
             
                     <!-- Slots -->
+                    <Border Visibility="{Binding ForeignRegionRandomSlotsWarning, Converter={StaticResource VisibleOnTrue}}"
+                            Margin="0,4" Padding="10,5" CornerRadius="5"
+                            Background="{StaticResource WarningBackgroundBrush}">
+                        <StackPanel>
+                            <TextBlock Foreground="{StaticResource MediumBackgroundBrush}" TextWrapping="Wrap"
+                                       Text="The game may not generate local resources for slots on an island from another region." />
+                            <ToggleButton Style="{StaticResource FancyToggleButton}" Margin="0,6,0,0"
+                                          IsChecked="{Binding AppRandomizeSlots}">
+                                <TextBlock Margin="5,0" Text="App randomizes slots" />
+                            </ToggleButton>
+                            <Grid Margin="0,6,0,0" Visibility="{Binding AppRandomizeSlots, Converter={StaticResource VisibleOnTrue}}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="Ore: Min / Max" />
+                                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                    <TextBox Width="45" Text="{Binding AppRandomOreMin, UpdateSourceTrigger=PropertyChanged}" />
+                                    <TextBlock Margin="4,0" Text="/" />
+                                    <TextBox Width="45" Text="{Binding AppRandomOreMax, UpdateSourceTrigger=PropertyChanged}" />
+                                </StackPanel>
+                                <TextBlock Grid.Row="1" Text="Clay: Min / Max" />
+                                <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
+                                    <TextBox Width="45" Text="{Binding AppRandomClayMin, UpdateSourceTrigger=PropertyChanged}" />
+                                    <TextBlock Margin="4,0" Text="/" />
+                                    <TextBox Width="45" Text="{Binding AppRandomClayMax, UpdateSourceTrigger=PropertyChanged}" />
+                                </StackPanel>
+                            </Grid>
+                            <StackPanel Orientation="Horizontal" Visibility="{Binding AppRandomizeSlots, Converter={StaticResource VisibleOnTrue}}">
+                                <TextBlock VerticalAlignment="Center" Text="Oil: Min / Max" />
+                                <TextBox Width="45" Margin="8,0,0,0" Text="{Binding AppRandomOilMin, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBlock Margin="4,0" Text="/" />
+                                <TextBox Width="45" Text="{Binding AppRandomOilMax, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
                     <slots:SlotsControl DataContext="{Binding SlotsViewModel}" />
                 </StackPanel>
                 

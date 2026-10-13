@@ -14,20 +14,17 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
     {
         private const long GOLD_ORE_GUID = 1010507;
 
-        public static readonly SlotAsset EmptySlot = new()
-        {
-            DisplayName = "Empty"
-        };
+        private readonly SlotAsset _emptySlot;
 
 
         public SlotAssignment SlotAssignment { get; init; }
 
         public SlotAsset AssignedSlot
         {
-            get => SlotAssignment.AssignedSlot ?? EmptySlot;
+            get => SlotAssignment.AssignedSlot ?? _emptySlot;
             set
             {
-                SlotAssignment.AssignedSlot = value != EmptySlot ? value : null;
+                SlotAssignment.AssignedSlot = value != _emptySlot ? value : null;
                 OnPropertyChanged();
 
                 UpdateBrushes();
@@ -115,6 +112,10 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
         {
             SlotAssignment = slotAssignment;
             _selectedRegion = selectedRegion;
+            _emptySlot = new SlotAsset
+            {
+                DisplayName = $"Empty - Slot {slotAssignment.Slot.ObjectGuid}"
+            };
 
             ICollection<SlotAsset> originalSlotItems = slotAssignment.Slot.SlotAsset!.ReplacementSlotAssets;
             _originalSlotItems = new(originalSlotItems);
@@ -125,7 +126,7 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
                     .Concat(GetOreOptions(RegionAsset.Arctic))
                 : Enumerable.Empty<SlotAsset>();
             SlotItems = new(originalSlotItems.Concat(additionalOptions).Distinct());
-            SlotItems.Add(EmptySlot);
+            SlotItems.Add(_emptySlot);
 
             CollectionView fertilitiesView = (CollectionView)CollectionViewSource.GetDefaultView(SlotItems);
             fertilitiesView.Filter = SlotAssetFilter;
@@ -139,7 +140,7 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
             if (item is not SlotAsset slotAsset)
                 throw new ArgumentException();
 
-            if (slotAsset == EmptySlot || slotAsset == AssignedSlot)
+            if (slotAsset == _emptySlot || slotAsset == AssignedSlot)
                 return true;
 
             if (NewWorldAllOres && _selectedRegion == RegionAsset.SouthAmerica && IsMineSlot)
@@ -203,7 +204,7 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
 
         private void UpdateBrushes()
         {
-            if (AssignedSlot == EmptySlot)
+            if (AssignedSlot == _emptySlot)
             {
                 PinBrush = Brushes.LightGray;
                 BackgroundBrush = Brushes.Transparent;

@@ -17,14 +17,25 @@ namespace AnnoMapEditor.UI.Controls.Slots
 
         public ObservableCollection<SlotCounter> SlotCounters { get; init; } = new();
 
+        public int AvailableMineSlots { get; }
+        public int AvailableClaySlots { get; }
+        public int AvailableOilSlots { get; }
+
 
         public SlotsViewModel(FixedIslandElement fixedIsland, RegionAsset region)
         {
             FixedIsland = fixedIsland;
             Region = region;
 
+            AvailableMineSlots = CountSlots(SlotAsset.RANDOM_MINE);
+            AvailableClaySlots = CountSlots(SlotAsset.RANDOM_CLAY);
+            AvailableOilSlots = CountSlots(SlotAsset.RANDOM_OIL);
+
             RefreshMineSlotCount();
         }
+
+        private int CountSlots(string slotType) => FixedIsland.SlotAssignments.Values.Count(
+            assignment => SlotAsset.GetRandomSlotType(assignment.Slot.ObjectGuid) == slotType);
 
         private void RefreshMineSlotCount()
         {

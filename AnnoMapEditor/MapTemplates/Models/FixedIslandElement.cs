@@ -98,6 +98,30 @@ namespace AnnoMapEditor.MapTemplates.Models
         }
         private bool _randomizeSlots = true;
 
+        /// <summary>
+        /// Uses the editor to assign region-compatible resources when the game's generator
+        /// cannot reliably randomize slots on a foreign or custom island.
+        /// </summary>
+        public bool AppRandomizeSlots
+        {
+            get => _appRandomizeSlots;
+            set => SetProperty(ref _appRandomizeSlots, value);
+        }
+        private bool _appRandomizeSlots;
+
+        public int AppRandomOreMin { get => _appRandomOreMin; set => SetProperty(ref _appRandomOreMin, Math.Max(0, value)); }
+        private int _appRandomOreMin = 1;
+        public int AppRandomOreMax { get => _appRandomOreMax; set => SetProperty(ref _appRandomOreMax, Math.Max(0, value)); }
+        private int _appRandomOreMax = 3;
+        public int AppRandomClayMin { get => _appRandomClayMin; set => SetProperty(ref _appRandomClayMin, Math.Max(0, value)); }
+        private int _appRandomClayMin = 1;
+        public int AppRandomClayMax { get => _appRandomClayMax; set => SetProperty(ref _appRandomClayMax, Math.Max(0, value)); }
+        private int _appRandomClayMax = 3;
+        public int AppRandomOilMin { get => _appRandomOilMin; set => SetProperty(ref _appRandomOilMin, Math.Max(0, value)); }
+        private int _appRandomOilMin = 1;
+        public int AppRandomOilMax { get => _appRandomOilMax; set => SetProperty(ref _appRandomOilMax, Math.Max(0, value)); }
+        private int _appRandomOilMax = 3;
+
         public Dictionary<long, SlotAssignment> SlotAssignments { get; init; } = new();
 
 
@@ -328,23 +352,144 @@ namespace AnnoMapEditor.MapTemplates.Models
         {
             TemplateElement templateElement = base.ToTemplate();
 
-            if (!AppRandomizeFertilities || !_randomizeFertilities || IslandAsset.Region.GUID == mapRegion.GUID)
-                return templateElement;
+            if (AppRandomizeFertilities && _randomizeFertilities && IslandAsset.Region.GUID != mapRegion.GUID)
+            {
+                List<FertilityAsset> candidates = mapRegion.AllowedFertilities.Distinct().ToList();
+                int minimum = Math.Min(AppRandomFertilitiesMin, candidates.Count);
+                int maximum = Math.Clamp(AppRandomFertilitiesMax, minimum, candidates.Count);
+                int count = Random.Shared.Next(minimum, maximum + 1);
 
-            List<FertilityAsset> candidates = mapRegion.AllowedFertilities.Distinct().ToList();
-            int minimum = Math.Min(AppRandomFertilitiesMin, candidates.Count);
-            int maximum = Math.Clamp(AppRandomFertilitiesMax, minimum, candidates.Count);
-            int count = Random.Shared.Next(minimum, maximum + 1);
+                int[] fertilityGuids = candidates
+                    .OrderBy(_ => Random.Shared.Next())
+                    .Take(count)
+                    .Select(fertility => (int)fertility.GUID)
+                    .ToArray();
 
-            int[] fertilityGuids = candidates
-                .OrderBy(_ => Random.Shared.Next())
-                .Take(count)
-                .Select(fertility => (int)fertility.GUID)
-                .ToArray();
+                templateElement.Element!.RandomizeFertilities = false;
+                templateElement.Element.FertilityGuids = fertilityGuids;
+            }
 
-            templateElement.Element!.RandomizeFertilities = false;
-            templateElement.Element.FertilityGuids = fertilityGuids;
+            if (AppRandomizeSlots && _randomizeSlots
+                && (IslandAsset.CustomSourceDirectory != null || IslandAsset.Region.GUID != mapRegion.GUID))
+            {
+                templateElement.Element.MineSlotMapping = CreateAppRandomSlotMapping(mapRegion);
+            }
             return templateElement;
+        }
+
+        private List<Tuple<long, int>> CreateAppRandomSlotMapping(RegionAsset mapRegion)
+        {
+            Dictionary<string, List<Slot>> slotsByType = IslandAsset.Slots.Values
+                .Where(slot => slot.SlotAsset != null)
+                .GroupBy(slot => SlotAsset.GetRandomSlotType(slot.ObjectGuid))
+                .ToDictionary(group => group.Key, group => group.ToList());
+            Dictionary<long, SlotAsset?> assignments = IslandAsset.Slots.Values
+                .Where(slot => slot.SlotAsset != null)
+                .ToDictionary(slot => slot.ObjectId, _ => (SlotAsset?)null);
+
+            foreach ((string slotType, List<Slot> slots) in slotsByType)
+            {
+                if (slotType == SlotAsset.RANDOM_MINE)
+                    AssignEachLocalResource(slots, assignments, mapRegion, AppRandomOreMin, AppRandomOreMax);
+                else if (slotType == SlotAsset.RANDOM_CLAY)
+                    AssignLocalResourceSlots(slots, assignments, mapRegion, AppRandomClayMin, AppRandomClayMax);
+                else if (slotType == SlotAsset.RANDOM_OIL)
+                    AssignLocalResourceSlots(slots, assignments, mapRegion, AppRandomOilMin, AppRandomOilMax);
+                else
+                    AssignOtherSlots(slots, assignments, mapRegion);
+            }
+
+            return IslandAsset.Slots.Values
+                .Where(slot => slot.SlotAsset != null)
+                .Select(slot => new Tuple<long, int>(slot.ObjectId, (int)(assignments[slot.ObjectId]?.GUID ?? 0)))
+                .ToList();
+        }
+
+        /// <summary>
+        /// Assigns every locally available ore type independently. For example, Ore 3/5 gives
+        /// every ore type a target between three and five slots (where that many slots exist).
+        /// </summary>
+        private static void AssignEachLocalResource(List<Slot> slots, Dictionary<long, SlotAsset?> assignments,
+            RegionAsset mapRegion, int minimum, int maximum)
+        {
+            List<SlotAsset> localResources = slots
+                .SelectMany(slot => GetLocalSlotOptions(slot, mapRegion))
+                .DistinctBy(asset => asset.GUID)
+                .OrderBy(_ => Random.Shared.Next())
+                .ToList();
+
+            int normalizedMinimum = Math.Max(0, minimum);
+            int normalizedMaximum = Math.Max(normalizedMinimum, maximum);
+            Dictionary<SlotAsset, int> targets = localResources.ToDictionary(
+                resource => resource,
+                _ => Random.Shared.Next(normalizedMinimum, normalizedMaximum + 1));
+
+            // Fill the minimum for every resource first. This prevents an early resource from
+            // consuming slots that are required to satisfy another ore's minimum.
+            for (int round = 0; round < normalizedMinimum; round++)
+            {
+                foreach (SlotAsset resource in localResources.OrderBy(_ => Random.Shared.Next()))
+                {
+                    Slot? availableSlot = slots
+                        .Where(slot => assignments[slot.ObjectId] == null && GetLocalSlotOptions(slot, mapRegion).Contains(resource))
+                        .OrderBy(_ => Random.Shared.Next())
+                        .FirstOrDefault();
+                    if (availableSlot != null)
+                        assignments[availableSlot.ObjectId] = resource;
+                }
+            }
+
+            foreach (SlotAsset resource in localResources.OrderBy(_ => Random.Shared.Next()))
+            {
+                int alreadyAssigned = assignments.Values.Count(assignment => assignment == resource);
+                int remaining = targets[resource] - alreadyAssigned;
+                foreach (Slot slot in slots
+                    .Where(slot => assignments[slot.ObjectId] == null && GetLocalSlotOptions(slot, mapRegion).Contains(resource))
+                    .OrderBy(_ => Random.Shared.Next())
+                    .Take(Math.Max(0, remaining)))
+                {
+                    assignments[slot.ObjectId] = resource;
+                }
+            }
+        }
+
+        /// <summary>Assigns one local resource type to a total number of slots in the Min/Max range.</summary>
+        private static void AssignLocalResourceSlots(List<Slot> slots, Dictionary<long, SlotAsset?> assignments,
+            RegionAsset mapRegion, int minimum, int maximum)
+        {
+            int count = GetRandomSlotCount(minimum, maximum);
+            foreach (Slot slot in slots
+                .Where(slot => GetLocalSlotOptions(slot, mapRegion).Count > 0)
+                .OrderBy(_ => Random.Shared.Next())
+                .Take(count))
+            {
+                List<SlotAsset> options = GetLocalSlotOptions(slot, mapRegion);
+                assignments[slot.ObjectId] = options[Random.Shared.Next(options.Count)];
+            }
+        }
+
+        private static void AssignOtherSlots(List<Slot> slots, Dictionary<long, SlotAsset?> assignments, RegionAsset mapRegion)
+        {
+            foreach (Slot slot in slots)
+            {
+                List<SlotAsset> options = GetLocalSlotOptions(slot, mapRegion);
+                if (options.Count > 0)
+                    assignments[slot.ObjectId] = options[Random.Shared.Next(options.Count)];
+            }
+        }
+
+        private static int GetRandomSlotCount(int minimum, int maximum)
+        {
+            minimum = Math.Max(0, minimum);
+            maximum = Math.Max(minimum, maximum);
+            return Random.Shared.Next(minimum, maximum + 1);
+        }
+
+        private static List<SlotAsset> GetLocalSlotOptions(Slot slot, RegionAsset mapRegion)
+        {
+            return slot.SlotAsset!.ReplacementSlotAssets
+                .Where(asset => asset.AssociatedRegions.Contains(mapRegion))
+                .ToList();
         }
     }
 }

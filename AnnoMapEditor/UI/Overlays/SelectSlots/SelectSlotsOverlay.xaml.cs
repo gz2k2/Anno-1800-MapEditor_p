@@ -36,6 +36,7 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
             ClayFilter.ValueChanged += Filter_ValueChanged;
             MinesFilter.ValueChanged += Filter_ValueChanged;
             OilFilter.ValueChanged += Filter_ValueChanged;
+            GasFilter.ValueChanged += Filter_ValueChanged;
         }
 
 

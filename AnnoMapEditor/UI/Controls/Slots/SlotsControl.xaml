@@ -28,6 +28,17 @@
         <TextBlock Text="Slots"
                    Style="{StaticResource SubHeaderLabelStyle}"/>
 
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,4"
+                    TextElement.Foreground="{StaticResource ForegroundBrush}">
+            <TextBlock Text="Available: " />
+            <TextBlock Text="Mines " />
+            <TextBlock Text="{Binding AvailableMineSlots}" FontWeight="Bold" Margin="0,0,8,0" />
+            <TextBlock Text="Clay " />
+            <TextBlock Text="{Binding AvailableClaySlots}" FontWeight="Bold" Margin="0,0,8,0" />
+            <TextBlock Text="Oil " />
+            <TextBlock Text="{Binding AvailableOilSlots}" FontWeight="Bold" />
+        </StackPanel>
+
         <controls:FancyToggle Label="Randomize" 
                               OnText="Yes" OffText="No" 
                               IsChecked="{Binding FixedIsland.RandomizeSlots, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />

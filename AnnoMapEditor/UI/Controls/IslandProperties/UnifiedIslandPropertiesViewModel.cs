@@ -114,8 +114,29 @@ namespace AnnoMapEditor.UI.Controls.IslandProperties
         public bool AllowedFertilitiesWarning => FertilityItems.Any(f => f is { IsAllowed: false, IsSelected: true })
                                                  && !RandomizeFertilities;
         public bool ForeignRegionRandomFertilitiesWarning => SelectedIsland is FixedIslandElement fixedIsland
-            && fixedIsland.IslandAsset.Region.GUID != MapTemplate.Session.Region.GUID
+            && (fixedIsland.IslandAsset.CustomSourceDirectory != null
+                || fixedIsland.IslandAsset.Region.GUID != MapTemplate.Session.Region.GUID)
             && RandomizeFertilities;
+        public bool ForeignRegionRandomSlotsWarning => SelectedIsland is FixedIslandElement fixedIsland
+            && (fixedIsland.IslandAsset.CustomSourceDirectory != null
+                || fixedIsland.IslandAsset.Region.GUID != MapTemplate.Session.Region.GUID)
+            && fixedIsland.RandomizeSlots;
+        public bool AppRandomizeSlots
+        {
+            get => (SelectedIsland as FixedIslandElement)?.AppRandomizeSlots ?? false;
+            set
+            {
+                if (SelectedIsland is FixedIslandElement fixedIsland)
+                    fixedIsland.AppRandomizeSlots = value;
+                OnPropertyChanged();
+            }
+        }
+        public int AppRandomOreMin { get => (SelectedIsland as FixedIslandElement)?.AppRandomOreMin ?? 0; set => SetAppRandomSlotValue(island => island.AppRandomOreMin = value, nameof(AppRandomOreMin)); }
+        public int AppRandomOreMax { get => (SelectedIsland as FixedIslandElement)?.AppRandomOreMax ?? 0; set => SetAppRandomSlotValue(island => island.AppRandomOreMax = value, nameof(AppRandomOreMax)); }
+        public int AppRandomClayMin { get => (SelectedIsland as FixedIslandElement)?.AppRandomClayMin ?? 0; set => SetAppRandomSlotValue(island => island.AppRandomClayMin = value, nameof(AppRandomClayMin)); }
+        public int AppRandomClayMax { get => (SelectedIsland as FixedIslandElement)?.AppRandomClayMax ?? 0; set => SetAppRandomSlotValue(island => island.AppRandomClayMax = value, nameof(AppRandomClayMax)); }
+        public int AppRandomOilMin { get => (SelectedIsland as FixedIslandElement)?.AppRandomOilMin ?? 0; set => SetAppRandomSlotValue(island => island.AppRandomOilMin = value, nameof(AppRandomOilMin)); }
+        public int AppRandomOilMax { get => (SelectedIsland as FixedIslandElement)?.AppRandomOilMax ?? 0; set => SetAppRandomSlotValue(island => island.AppRandomOilMax = value, nameof(AppRandomOilMax)); }
         public bool AppRandomizeFertilities
         {
             get => (SelectedIsland as FixedIslandElement)?.AppRandomizeFertilities ?? false;
@@ -147,6 +168,13 @@ namespace AnnoMapEditor.UI.Controls.IslandProperties
             }
         }
         public SlotsViewModel? SlotsViewModel { get; private set; }
+
+        private void SetAppRandomSlotValue(System.Action<FixedIslandElement> setValue, string propertyName)
+        {
+            if (SelectedIsland is FixedIslandElement fixedIsland)
+                setValue(fixedIsland);
+            OnPropertyChanged(propertyName);
+        }
 
         private void ToolbarService_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
@@ -291,6 +319,12 @@ namespace AnnoMapEditor.UI.Controls.IslandProperties
                 case nameof(FixedIslandElement.RandomizeFertilities):
                     OnPropertyChanged(nameof(RandomizeFertilities));
                     OnPropertyChanged(nameof(ForeignRegionRandomFertilitiesWarning));
+                    break;
+                case nameof(FixedIslandElement.RandomizeSlots):
+                    OnPropertyChanged(nameof(ForeignRegionRandomSlotsWarning));
+                    break;
+                case nameof(FixedIslandElement.AppRandomizeSlots):
+                    OnPropertyChanged(nameof(AppRandomizeSlots));
                     break;
                 case nameof(FixedIslandElement.AppRandomizeFertilities):
                     OnPropertyChanged(nameof(AppRandomizeFertilities));

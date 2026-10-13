@@ -77,13 +77,13 @@
             <ColumnDefinition />
             <ColumnDefinition />
             <ColumnDefinition />
+            <ColumnDefinition />
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
 
         <!-- cancel button -->
-        <Button Grid.Column="4"
-                Grid.ColumnSpan="2"
-                Content="Close"
+        <Button Grid.Column="5"
+                Content="          Close          "
                 Click="{e:EventBinding OnClosed}"
                 IsCancel="True" />
 
@@ -118,9 +118,17 @@
                               IsChecked="{Binding ShowOil, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                               HorizontalAlignment="Center"
                               VerticalAlignment="Center"/>
-        <controls:FancyToggle x:Name="CustomFilter"
+        <controls:FancyToggle x:Name="GasFilter"
                               Grid.Row="1"
                               Grid.Column="3"
+                              Label="Gas"
+                              OnText="Show" OffText="Hide"
+                              IsChecked="{Binding ShowGas, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center"/>
+        <controls:FancyToggle x:Name="CustomFilter"
+                              Grid.Row="1"
+                              Grid.Column="4"
                               Label="Unknown"
                               OnText="Show" OffText="Hide"
                               IsChecked="{Binding ShowCustom, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -153,7 +161,7 @@
 
         <!-- region warning -->
         <DockPanel Grid.Row="2"
-                   Grid.ColumnSpan="5"
+                   Grid.ColumnSpan="6"
                    Background="DarkRed">
             <TextBlock Text="Slots from regions other than the session's region may not work correctly. Additional mods may be required."
                        HorizontalAlignment="Center"
@@ -165,7 +173,7 @@
         <!-- map -->
         <ListBox x:Name="Map"
                  Grid.Row="3"
-                 Grid.ColumnSpan="5"
+                 Grid.ColumnSpan="6"
                  Background="Transparent"
                  ItemsSource="{Binding SlotAssignmentViewModels}"
                  Width="{Binding FixedIsland.IslandAsset.SizeInTiles}"
@@ -220,7 +228,7 @@
         <Canvas x:Name="LineCanvas"
                 Grid.Column="0"
                 Grid.Row="3"
-                Grid.ColumnSpan="3">
+                Grid.ColumnSpan="4">
         </Canvas>
 
         <!-- selectors -->
@@ -236,7 +244,7 @@
         </ItemsControl>
         <ItemsControl x:Name="SlotSelectionsRight"
                   Grid.Row="3"
-                  Grid.Column="4"
+                  Grid.Column="5"
                   HorizontalAlignment="Right"
                   VerticalAlignment="Center"
                   Background="{StaticResource MediumBackgroundBrush}"

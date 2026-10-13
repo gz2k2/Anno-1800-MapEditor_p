@@ -143,6 +143,17 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
         }
         private bool _showOil = true;
 
+        public bool ShowGas
+        {
+            get => _showGas;
+            set
+            {
+                SetProperty(ref _showGas, value);
+                UpdateFilter();
+            }
+        }
+        private bool _showGas = true;
+
         public bool ShowCustom
         {
             get => _showCustom;
@@ -262,6 +273,9 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
                 return false;
 
             if (!ShowOil && slotType == SlotAsset.RANDOM_OIL)
+                return false;
+
+            if (!ShowGas && slotType == SlotAsset.RANDOM_GAS)
                 return false;
 
             if (!ShowCustom && slotType == SlotAsset.RANDOM_CUSTOM)
