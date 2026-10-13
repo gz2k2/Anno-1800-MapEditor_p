@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace AnnoMapEditor.UI.Controls.Slots
 {
-    public class SlotsViewModel
+    public class SlotsViewModel : ObservableBase
     {
         public FixedIslandElement FixedIsland { get; init; }
 
@@ -21,6 +21,23 @@ namespace AnnoMapEditor.UI.Controls.Slots
         public int AvailableClaySlots { get; }
         public int AvailableOilSlots { get; }
         public int AvailableOreTypes { get; }
+        public bool ShowAppRandomSlotsWarning => FixedIsland.RandomizeSlots
+            && (FixedIsland.IslandAsset.CustomSourceDirectory != null || FixedIsland.IslandAsset.Region.GUID != Region.GUID);
+        public bool AppRandomizeSlots
+        {
+            get => FixedIsland.AppRandomizeSlots;
+            set
+            {
+                FixedIsland.AppRandomizeSlots = value;
+                OnPropertyChanged();
+            }
+        }
+        public int AppRandomOreMin { get => FixedIsland.AppRandomOreMin; set => SetAppRandomValue(value, v => FixedIsland.AppRandomOreMin = v, nameof(AppRandomOreMin)); }
+        public int AppRandomOreMax { get => FixedIsland.AppRandomOreMax; set => SetAppRandomValue(value, v => FixedIsland.AppRandomOreMax = v, nameof(AppRandomOreMax)); }
+        public int AppRandomClayMin { get => FixedIsland.AppRandomClayMin; set => SetAppRandomValue(value, v => FixedIsland.AppRandomClayMin = v, nameof(AppRandomClayMin)); }
+        public int AppRandomClayMax { get => FixedIsland.AppRandomClayMax; set => SetAppRandomValue(value, v => FixedIsland.AppRandomClayMax = v, nameof(AppRandomClayMax)); }
+        public int AppRandomOilMin { get => FixedIsland.AppRandomOilMin; set => SetAppRandomValue(value, v => FixedIsland.AppRandomOilMin = v, nameof(AppRandomOilMin)); }
+        public int AppRandomOilMax { get => FixedIsland.AppRandomOilMax; set => SetAppRandomValue(value, v => FixedIsland.AppRandomOilMax = v, nameof(AppRandomOilMax)); }
 
 
         public SlotsViewModel(FixedIslandElement fixedIsland, RegionAsset region)
@@ -42,8 +59,19 @@ namespace AnnoMapEditor.UI.Controls.Slots
                 .Where(ore => ore.AssociatedRegions.Contains(Region))
                 .DistinctBy(ore => ore.GUID)
                 .Count();
+            FixedIsland.PropertyChanged += (_, e) =>
+            {
+                if (e.PropertyName == nameof(FixedIslandElement.RandomizeSlots))
+                    OnPropertyChanged(nameof(ShowAppRandomSlotsWarning));
+            };
 
             RefreshMineSlotCount();
+        }
+
+        private void SetAppRandomValue(int value, System.Action<int> setValue, string propertyName)
+        {
+            setValue(value);
+            OnPropertyChanged(propertyName);
         }
 
         private int CountSlots(string slotType) => FixedIsland.SlotAssignments.Values.Count(

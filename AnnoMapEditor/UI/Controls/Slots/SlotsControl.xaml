@@ -18,6 +18,7 @@
                 <ResourceDictionary>
                     <converters:BooleaNotConverter x:Key="BooleanNot" />
                     <converters:BoolToVisibility x:Key="VisibleOnFalse" OnTrue="Collapsed" OnFalse="Visible" />
+                    <converters:BoolToVisibility x:Key="VisibleOnTrue" OnTrue="Visible" OnFalse="Collapsed" />
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
@@ -44,6 +45,44 @@
         <controls:FancyToggle Label="Randomize" 
                               OnText="Yes" OffText="No" 
                               IsChecked="{Binding FixedIsland.RandomizeSlots, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+        <Border Visibility="{Binding ShowAppRandomSlotsWarning, Converter={StaticResource VisibleOnTrue}}"
+                Margin="0,4" Padding="10,5" CornerRadius="5"
+                Background="{StaticResource WarningBackgroundBrush}">
+            <StackPanel>
+                <TextBlock Foreground="{StaticResource MediumBackgroundBrush}" TextWrapping="Wrap"
+                           Text="The game may not generate local resources for slots on an island from another region." />
+                <ToggleButton Style="{StaticResource FancyToggleButton}" Margin="0,6,0,0"
+                              IsChecked="{Binding AppRandomizeSlots}">
+                    <TextBlock Margin="5,0" Text="App randomizes slots" />
+                </ToggleButton>
+                <Grid Margin="0,6,0,0" Visibility="{Binding AppRandomizeSlots, Converter={StaticResource VisibleOnTrue}}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="55" />
+                        <ColumnDefinition Width="18" />
+                        <ColumnDefinition Width="55" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="Ore: Min / Max" VerticalAlignment="Center" />
+                    <TextBox Grid.Column="1" Text="{Binding AppRandomOreMin, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock Grid.Column="2" Text="/" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <TextBox Grid.Column="3" Text="{Binding AppRandomOreMax, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock Grid.Row="1" Text="Clay: Min / Max" VerticalAlignment="Center" />
+                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding AppRandomClayMin, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock Grid.Row="1" Grid.Column="2" Text="/" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding AppRandomClayMax, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock Grid.Row="2" Text="Oil: Min / Max" VerticalAlignment="Center" />
+                    <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding AppRandomOilMin, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock Grid.Row="2" Grid.Column="2" Text="/" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <TextBox Grid.Row="2" Grid.Column="3" Text="{Binding AppRandomOilMax, UpdateSourceTrigger=PropertyChanged}" />
+                </Grid>
+            </StackPanel>
+        </Border>
 
         <ListBox ItemsSource="{Binding SlotCounters}"
                  Visibility="{Binding FixedIsland.RandomizeSlots, Converter={StaticResource VisibleOnFalse}}"
