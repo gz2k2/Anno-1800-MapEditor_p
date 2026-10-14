@@ -27,7 +27,9 @@
                                   Margin="2"
                                   MinWidth="150"
                                   GotFocus="{e:EventBinding OnGotFocus}"
-                                  LostFocus="{e:EventBinding OnLostFocus}">
+                                  LostFocus="{e:EventBinding OnLostFocus}"
+                                  MouseEnter="{e:EventBinding OnGotFocus}"
+                                  MouseLeave="{e:EventBinding OnLostFocus}">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Height="30"
