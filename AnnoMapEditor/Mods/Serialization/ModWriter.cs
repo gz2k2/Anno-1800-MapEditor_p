@@ -162,6 +162,7 @@ namespace AnnoMapEditor.Mods.Serialization
 
             await WriteAssetsXml(modPath, mapTemplatesToReplace);
             CopyCustomIslandDirectories(mod.MapTemplate, modPath);
+            CopyAdditionalFiles(mod.MapTemplate, modPath);
 
             return true;
         }
@@ -202,6 +203,46 @@ namespace AnnoMapEditor.Mods.Serialization
                 }
             }
         }
+
+        /// <summary>
+        /// Copies the optional shared assets belonging to custom-island collections. A collection
+        /// places its islands in child directories and may provide an <c>additional_files</c>
+        /// sibling directory whose contents already start at <c>data</c>.
+        /// </summary>
+        internal static void CopyAdditionalFiles(MapTemplate mapTemplate, string modPath)
+        {
+            IEnumerable<string> collectionDirectories = mapTemplate.Elements
+                .OfType<FixedIslandElement>()
+                .Select(element => element.IslandAsset.CustomSourceDirectory)
+                .Where(directory => !string.IsNullOrWhiteSpace(directory))
+                .Select(directory => Path.GetDirectoryName(Path.TrimEndingDirectorySeparator(directory!)))
+                .Where(directory => !string.IsNullOrWhiteSpace(directory))
+                .Distinct(StringComparer.OrdinalIgnoreCase)!;
+
+            foreach (string collectionDirectory in collectionDirectories)
+            {
+                string additionalFilesDirectory = Path.Combine(collectionDirectory, "additional_files");
+                if (!Directory.Exists(additionalFilesDirectory))
+                    continue;
+
+                CopyDirectoryContents(additionalFilesDirectory, modPath);
+            }
+        }
+
+        private static void CopyDirectoryContents(string sourceDirectory, string targetDirectory)
+        {
+            foreach (string sourceFile in Directory.EnumerateFiles(sourceDirectory, "*", SearchOption.AllDirectories))
+            {
+                string relativePath = Path.GetRelativePath(sourceDirectory, sourceFile);
+                string targetFile = Path.Combine(targetDirectory, relativePath);
+                string? targetFileDirectory = Path.GetDirectoryName(targetFile);
+                if (targetFileDirectory != null)
+                    Directory.CreateDirectory(targetFileDirectory);
+                File.Copy(sourceFile, targetFile, overwrite: true);
+            }
+        }
+
+
 
         private static async Task WriteAssetsXml(string modPath, IEnumerable<MapTemplateAsset> mapTemplatesToReplace)
         {
