@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Data;
+using System.Windows.Media;
 
 namespace AnnoMapEditor.UI.Overlays.SelectSlots
 {
@@ -204,6 +205,9 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
         public ObservableCollection<SlotAssignmentViewModel> SlotAssignmentViewModels { get; init; }
         public IEnumerable<SlotAssignmentViewModel> SlotAssignmentViewModelsLeft { get; private set; }
         public IEnumerable<SlotAssignmentViewModel> SlotAssignmentViewModelsRight { get; private set; }
+        public ObservableCollection<GuidFilterItem> GuidFilterItems { get; init; } = new();
+
+        private readonly Dictionary<long, GuidFilterItem> _guidFilters = new();
 
 
         public SelectSlotsViewModel(RegionAsset region, FixedIslandElement fixedIsland)
@@ -217,6 +221,16 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
                     .Select(s => new SlotAssignmentViewModel(s, region))
                     .OrderByDescending(s => s.SlotAssignment.Slot.Position, new SlotPositionHorizontalAxisComparer())
                 );
+
+            foreach (long guid in SlotAssignmentViewModels
+                .Select(slot => slot.SlotAssignment.Slot.ObjectGuid)
+                .Distinct()
+                .OrderBy(guid => guid))
+            {
+                GuidFilterItem filterItem = new(guid, UpdateFilter);
+                GuidFilterItems.Add(filterItem);
+                _guidFilters.Add(guid, filterItem);
+            }
 
             ArrangeSlots();
 
@@ -281,6 +295,10 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
             if (!ShowCustom && slotType == SlotAsset.RANDOM_CUSTOM)
                 return false;
 
+            if (_guidFilters.TryGetValue(slotGroupId, out GuidFilterItem? guidFilter)
+                && !guidFilter.IsVisible)
+                return false;
+
             return true;
         }
 
@@ -307,6 +325,41 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
         public void OnClosed()
         {
             OverlayService.Instance.Close(this);
+        }
+
+        public class GuidFilterItem : ObservableBase
+        {
+            public long Guid { get; init; }
+
+            public string DisplayName => Guid.ToString();
+
+            public Brush LabelForeground => SlotAsset.GetRandomSlotType(Guid) switch
+            {
+                SlotAsset.RANDOM_MINE => Brushes.Gold,
+                SlotAsset.RANDOM_CLAY => Brushes.Orange,
+                SlotAsset.RANDOM_OIL => Brushes.LightBlue,
+                SlotAsset.RANDOM_GAS => Brushes.Red,
+                _ => Brushes.White
+            };
+
+            public bool IsVisible
+            {
+                get => _isVisible;
+                set
+                {
+                    if (SetProperty(ref _isVisible, value))
+                        _onChanged();
+                }
+            }
+            private bool _isVisible = true;
+
+            private readonly Action _onChanged;
+
+            public GuidFilterItem(long guid, Action onChanged)
+            {
+                Guid = guid;
+                _onChanged = onChanged;
+            }
         }
 
         public class FilteredItemsChangedEventArgs<T> : EventArgs

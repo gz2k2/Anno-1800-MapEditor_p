@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Media;
 
 namespace AnnoMapEditor.UI.Controls
 {
@@ -19,6 +20,9 @@ namespace AnnoMapEditor.UI.Controls
         public static readonly DependencyProperty LabelProperty =
               DependencyProperty.Register("Label", typeof(object),
             typeof(FancyToggle), new UIPropertyMetadata(string.Empty));
+        public static readonly DependencyProperty LabelForegroundProperty =
+              DependencyProperty.Register("LabelForeground", typeof(Brush),
+            typeof(FancyToggle), new UIPropertyMetadata(null));
 
         public bool IsChecked
         {
@@ -42,6 +46,12 @@ namespace AnnoMapEditor.UI.Controls
         {
             get => (string)GetValue(LabelProperty);
             set => SetValue(LabelProperty, value);
+        }
+
+        public Brush? LabelForeground
+        {
+            get => (Brush?)GetValue(LabelForegroundProperty);
+            set => SetValue(LabelForegroundProperty, value);
         }
 
         public event RoutedEventHandler? ValueChanged;

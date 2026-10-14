@@ -171,9 +171,7 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
             return false;
         }
 
-        private bool IsMineSlot => SlotAssignment.Slot.ObjectGuid == SlotAsset.RANDOM_MINE_OLD_WORLD_GUID
-            || SlotAssignment.Slot.ObjectGuid == SlotAsset.RANDOM_MINE_NEW_WORLD_GUID
-            || SlotAssignment.Slot.ObjectGuid == SlotAsset.RANDOM_MINE_ARCTIC_GUID;
+        private bool IsMineSlot => SlotAsset.IsRandomMineSlot(SlotAssignment.Slot.ObjectGuid);
 
         private static IEnumerable<SlotAsset> GetOreOptions(RegionAsset region)
         {
@@ -213,14 +211,14 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
             {
                 long randomSlotGuid = SlotAssignment.Slot.ObjectGuid;
 
-                if (randomSlotGuid == SlotAsset.RANDOM_MINE_OLD_WORLD_GUID
-                    || randomSlotGuid == SlotAsset.RANDOM_MINE_NEW_WORLD_GUID
-                    || randomSlotGuid == SlotAsset.RANDOM_MINE_ARCTIC_GUID)
+                if (SlotAsset.IsRandomMineSlot(randomSlotGuid))
                     PinBrush = Brushes.Gray;
-                else if (randomSlotGuid == SlotAsset.RANDOM_CLAY_GUID)
+                else if (SlotAsset.RANDOM_CLAY_GUIDS.Contains(randomSlotGuid))
                     PinBrush = Brushes.Orange;
-                else if (randomSlotGuid == SlotAsset.RANDOM_OIL_GUID)
-                    PinBrush = Brushes.Blue;
+                else if (SlotAsset.RANDOM_OIL_GUIDS.Contains(randomSlotGuid))
+                    PinBrush = Brushes.LightBlue;
+                else if (SlotAsset.RANDOM_GAS_GUIDS.Contains(randomSlotGuid))
+                    PinBrush = Brushes.LightBlue;
                 else if (SlotAsset.GetRandomSlotType(randomSlotGuid) == SlotAsset.RANDOM_CUSTOM)
                     PinBrush = Brushes.Red;
 

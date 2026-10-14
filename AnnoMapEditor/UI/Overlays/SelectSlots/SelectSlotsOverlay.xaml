@@ -81,11 +81,53 @@
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
 
-        <!-- cancel button -->
-        <Button Grid.Column="5"
-                Content="          Close          "
-                Click="{e:EventBinding OnClosed}"
-                IsCancel="True" />
+        <!-- GUID filter and cancel button -->
+        <StackPanel Grid.Column="5"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right">
+            <ToggleButton x:Name="GuidFilterButton"
+                          Content="GUID Filter"
+                          Margin="2"
+                          Padding="8,2"
+                          IsChecked="False" />
+            <Button Content="          Close          "
+                    Click="{e:EventBinding OnClosed}"
+                    IsCancel="True" />
+        </StackPanel>
+
+        <Popup x:Name="GuidFilterPopup"
+               PlacementTarget="{Binding ElementName=GuidFilterButton}"
+               DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}"
+               Placement="Bottom"
+               StaysOpen="False"
+               AllowsTransparency="True"
+               IsOpen="{Binding IsChecked, ElementName=GuidFilterButton, Mode=TwoWay}">
+            <Border Background="{StaticResource MediumBackgroundBrush}"
+                    BorderBrush="{StaticResource ForegroundBrush}"
+                    BorderThickness="1"
+                    Padding="8">
+                <StackPanel MinWidth="220">
+                    <TextBlock Text="Slot GUIDs"
+                               Foreground="{StaticResource ForegroundBrush}"
+                               FontWeight="Bold"
+                               Margin="0,0,0,6" />
+                    <ScrollViewer MaxHeight="420"
+                                  VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{Binding GuidFilterItems}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <controls:FancyToggle Label="{Binding DisplayName}"
+                                                          LabelForeground="{Binding LabelForeground}"
+                                                          OnText="Show"
+                                                          OffText="Hide"
+                                                          IsChecked="{Binding IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </StackPanel>
+            </Border>
+        </Popup>
 
         <!-- filters -->
         <ComboBox Grid.Row="0"
@@ -98,6 +140,7 @@
                               Grid.Row="1"
                               Grid.Column="0"
                               Label="Mines" 
+                              LabelForeground="Gold"
                               OnText="Show" OffText="Hide" 
                               IsChecked="{Binding ShowMines, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                               HorizontalAlignment="Center"
@@ -106,6 +149,7 @@
                               Grid.Row="1"
                               Grid.Column="1"
                               Label="Clay" 
+                              LabelForeground="Orange"
                               OnText="Show" OffText="Hide" 
                               IsChecked="{Binding ShowClay, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                               HorizontalAlignment="Center"
@@ -114,6 +158,7 @@
                               Grid.Row="1"
                               Grid.Column="2"
                               Label="Oil" 
+                              LabelForeground="LightBlue"
                               OnText="Show" OffText="Hide" 
                               IsChecked="{Binding ShowOil, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                               HorizontalAlignment="Center"
@@ -122,6 +167,7 @@
                               Grid.Row="1"
                               Grid.Column="3"
                               Label="Gas"
+                              LabelForeground="Red"
                               OnText="Show" OffText="Hide"
                               IsChecked="{Binding ShowGas, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                               HorizontalAlignment="Center"

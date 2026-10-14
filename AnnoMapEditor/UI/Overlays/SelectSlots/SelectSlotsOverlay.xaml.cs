@@ -37,6 +37,7 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
             MinesFilter.ValueChanged += Filter_ValueChanged;
             OilFilter.ValueChanged += Filter_ValueChanged;
             GasFilter.ValueChanged += Filter_ValueChanged;
+            CustomFilter.ValueChanged += Filter_ValueChanged;
         }
 
 
@@ -64,6 +65,8 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
                 oldViewModel.FilterModified -= SelectSlotsViewModel_FilterChanged;
                 foreach (SlotAssignmentViewModel slotAssignment in oldViewModel.SlotAssignmentViewModels)
                     slotAssignment.PropertyChanged -= SlotAssginment_PropertyChanged;
+                foreach (SelectSlotsViewModel.GuidFilterItem guidFilterItem in oldViewModel.GuidFilterItems)
+                    guidFilterItem.PropertyChanged -= GuidFilterItem_PropertyChanged;
             }
 
             if (e.NewValue is SelectSlotsViewModel newViewModel)
@@ -71,6 +74,8 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
                 newViewModel.FilterModified += SelectSlotsViewModel_FilterChanged;
                 foreach (SlotAssignmentViewModel slotAssignment in newViewModel.SlotAssignmentViewModels)
                     slotAssignment.PropertyChanged += SlotAssginment_PropertyChanged;
+                foreach (SelectSlotsViewModel.GuidFilterItem guidFilterItem in newViewModel.GuidFilterItems)
+                    guidFilterItem.PropertyChanged += GuidFilterItem_PropertyChanged;
             }
 
             UpdatePointers();
@@ -114,6 +119,11 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
         {
             if (sender is SlotAssignmentViewModel slotAssignment)
                 UpdatePointer(slotAssignment);
+        }
+
+        private void GuidFilterItem_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            updateScheduled = true;
         }
 
         private void This_SizeChanged(object? sender, EventArgs e)

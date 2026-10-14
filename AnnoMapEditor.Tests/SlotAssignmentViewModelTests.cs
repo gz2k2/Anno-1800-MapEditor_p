@@ -14,9 +14,19 @@ public class SlotAssignmentViewModelTests
     [InlineData(SlotAsset.RANDOM_MINE_OLD_WORLD_GUID, SlotAsset.RANDOM_MINE)]
     [InlineData(SlotAsset.RANDOM_CLAY_GUID, SlotAsset.RANDOM_CLAY)]
     [InlineData(SlotAsset.RANDOM_OIL_GUID, SlotAsset.RANDOM_OIL)]
+    [InlineData(SlotAsset.RANDOM_GAS_GUID, SlotAsset.RANDOM_GAS)]
     public void RandomSlotTypeClassifiesUnknownGuidsAsCustom(long guid, string expectedType)
     {
         Assert.Equal(expectedType, SlotAsset.GetRandomSlotType(guid));
+    }
+
+    [Fact]
+    public void RandomSlotGuidCollectionsContainBuiltInGuids()
+    {
+        Assert.Contains(SlotAsset.RANDOM_MINE_OLD_WORLD_GUID, SlotAsset.RANDOM_MINE_GUIDS);
+        Assert.Contains(SlotAsset.RANDOM_CLAY_GUID, SlotAsset.RANDOM_CLAY_GUIDS);
+        Assert.Contains(SlotAsset.RANDOM_OIL_GUID, SlotAsset.RANDOM_OIL_GUIDS);
+        Assert.Contains(SlotAsset.RANDOM_GAS_GUID, SlotAsset.RANDOM_GAS_GUIDS);
     }
 
     [Theory]
@@ -38,7 +48,8 @@ public class SlotAssignmentViewModelTests
                         ReplacementSlotAssets = Array.Empty<SlotAsset>(),
                         AssociatedRegions = Array.Empty<RegionAsset>()
                     }
-                }
+                },
+                AssignedSlot = new SlotAsset { GUID = 1 }
             },
             null!);
 

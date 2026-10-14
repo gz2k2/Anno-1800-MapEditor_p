@@ -19,6 +19,32 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
         public const long RANDOM_OIL_GUID = 100849;
         public const long RANDOM_GAS_GUID = 113750;
 
+        // Additional random slot GUIDs can be added here by mods. The original
+        // constants remain available for backwards compatibility.
+        // seperate GUIDs with commas, e.g. 123456,789012,345678
+        public static readonly IReadOnlyCollection<long> RANDOM_MINE_GUIDS = new[]
+        {
+            RANDOM_MINE_OLD_WORLD_GUID,
+            RANDOM_MINE_NEW_WORLD_GUID,
+            RANDOM_MINE_ARCTIC_GUID,
+            618
+        };
+
+        public static readonly IReadOnlyCollection<long> RANDOM_OIL_GUIDS = new[]
+        {
+            RANDOM_OIL_GUID
+        };
+
+        public static readonly IReadOnlyCollection<long> RANDOM_CLAY_GUIDS = new[]
+        {
+            RANDOM_CLAY_GUID
+        };
+
+        public static readonly IReadOnlyCollection<long> RANDOM_GAS_GUIDS = new[]
+        {
+            RANDOM_GAS_GUID
+        };
+
         public const string RANDOM_MINE = "RANDOM_MINE";
         public const string RANDOM_CLAY = "RANDOM_CLAY";
         public const string RANDOM_OIL = "RANDOM_OIL";
@@ -27,15 +53,19 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
 
         public static string GetRandomSlotType(long slotGuid)
         {
-            return slotGuid switch
-            {
-                RANDOM_MINE_OLD_WORLD_GUID or RANDOM_MINE_NEW_WORLD_GUID or RANDOM_MINE_ARCTIC_GUID => RANDOM_MINE,
-                RANDOM_CLAY_GUID => RANDOM_CLAY,
-                RANDOM_OIL_GUID => RANDOM_OIL,
-                RANDOM_GAS_GUID => RANDOM_GAS,
-                _ => RANDOM_CUSTOM
-            };
+            if (RANDOM_MINE_GUIDS.Contains(slotGuid))
+                return RANDOM_MINE;
+            if (RANDOM_CLAY_GUIDS.Contains(slotGuid))
+                return RANDOM_CLAY;
+            if (RANDOM_OIL_GUIDS.Contains(slotGuid))
+                return RANDOM_OIL;
+            if (RANDOM_GAS_GUIDS.Contains(slotGuid))
+                return RANDOM_GAS;
+
+            return RANDOM_CUSTOM;
         }
+
+        public static bool IsRandomMineSlot(long slotGuid) => RANDOM_MINE_GUIDS.Contains(slotGuid);
 
 
         [StaticAsset(RANDOM_MINE_OLD_WORLD_GUID)]

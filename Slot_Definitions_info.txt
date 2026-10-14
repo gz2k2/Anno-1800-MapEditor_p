@@ -1,0 +1,30 @@
+File:
+/DataArchives/Assets/Models/SlotAssets.cs
+
+Line 22
+
+        // Additional random slot GUIDs can be added here by mods. The original
+        // constants remain available for backwards compatibility.
+        // seperate GUIDs with commas, e.g. 123456,789012,345678
+        public static readonly IReadOnlyCollection<long> RANDOM_MINE_GUIDS = new[]
+        {
+            RANDOM_MINE_OLD_WORLD_GUID,
+            RANDOM_MINE_NEW_WORLD_GUID,
+            RANDOM_MINE_ARCTIC_GUID,
+            618
+        };
+
+        public static readonly IReadOnlyCollection<long> RANDOM_OIL_GUIDS = new[]
+        {
+            RANDOM_OIL_GUID
+        };
+
+        public static readonly IReadOnlyCollection<long> RANDOM_CLAY_GUIDS = new[]
+        {
+            RANDOM_CLAY_GUID
+        };
+
+        public static readonly IReadOnlyCollection<long> RANDOM_GAS_GUIDS = new[]
+        {
+            RANDOM_GAS_GUID
+        };
