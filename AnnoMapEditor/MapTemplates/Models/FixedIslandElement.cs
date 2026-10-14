@@ -1,4 +1,4 @@
-﻿using Anno.FileDBModels.Anno1800.MapTemplate;
+using Anno.FileDBModels.Anno1800.MapTemplate;
 using AnnoMapEditor.DataArchives;
 using AnnoMapEditor.DataArchives.Assets;
 using AnnoMapEditor.DataArchives.Assets.Models;
@@ -487,9 +487,26 @@ namespace AnnoMapEditor.MapTemplates.Models
 
         private static List<SlotAsset> GetLocalSlotOptions(Slot slot, RegionAsset mapRegion)
         {
-            return slot.SlotAsset!.ReplacementSlotAssets
-                .Where(asset => asset.AssociatedRegions.Contains(mapRegion))
+            // If the slot is a random mine (e.g., Arctic slot 116037), use the combined mine pools.
+            if (SlotAsset.GetRandomSlotType(slot.ObjectGuid) == SlotAsset.RANDOM_MINE)
+            {
+                return new[] { SlotAsset.RandomMineOldWorld, SlotAsset.RandomMineNewWorld, SlotAsset.RandomMineArctic }
+                    .Where(mineSlot => mineSlot != null)
+                    .SelectMany(mineSlot => mineSlot.ReplacementSlotAssets)
+                    .Where(ore => ore.AssociatedRegions.Any(r => r.GUID == mapRegion.GUID))
+                    .DistinctBy(ore => ore.GUID)
+                    .ToList();
+            }
+
+            var options = slot.SlotAsset!.ReplacementSlotAssets
+                .Where(asset => asset.AssociatedRegions.Any(r => r.GUID == mapRegion.GUID))
                 .ToList();
+
+            // Fallback: if no region‑specific replacements, use all replacements (covers Arctic random mine)
+            if (options.Count == 0)
+                options = slot.SlotAsset!.ReplacementSlotAssets.ToList();
+
+            return options;
         }
     }
 }
