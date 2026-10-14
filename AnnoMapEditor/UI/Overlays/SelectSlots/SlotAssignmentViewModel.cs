@@ -197,12 +197,14 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
         public void OnLostFocus()
         {
             HasFocus = false;
-            PathThickness = 1;
+            PathThickness = AssignedSlot == _emptySlot ? 1 : 3;
         }
 
         private void UpdateBrushes()
         {
-            PinBrush = SlotAsset.GetRandomSlotType(SlotAssignment.Slot.ObjectGuid) switch
+            PathThickness = AssignedSlot == _emptySlot && !HasFocus ? 1 : 3;
+
+            Brush slotBrush = SlotAsset.GetRandomSlotType(SlotAssignment.Slot.ObjectGuid) switch
             {
                 SlotAsset.RANDOM_MINE => Brushes.Gold,
                 SlotAsset.RANDOM_CLAY => Brushes.Orange,
@@ -213,11 +215,17 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
 
             if (AssignedSlot == _emptySlot)
             {
+                // Keep empty slots identifiable, but make selected resources visibly stronger.
+                PinBrush = new SolidColorBrush(((SolidColorBrush)slotBrush).Color)
+                {
+                    Opacity = 0.7
+                };
                 BackgroundBrush = Brushes.Transparent;
             }
             else
             {
-                BackgroundBrush = PinBrush;
+                PinBrush = slotBrush;
+                BackgroundBrush = slotBrush;
             }
         }
     }
