@@ -1,6 +1,8 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using AnnoMapEditor.Utilities.UndoRedo;
+using System.Diagnostics;
+using System.Windows.Navigation;
 
 namespace AnnoMapEditor.UI.Controls.Toolbar
 {
@@ -93,6 +95,20 @@ namespace AnnoMapEditor.UI.Controls.Toolbar
             ToolbarService.Instance.ButtonContextClick(ToolbarButtonType.OpenSettingsWindow, sender);
             ToolbarCustomIslandsContextMenu.PlacementTarget = sender as UIElement;
             ToolbarCustomIslandsContextMenu.IsOpen = true;
+        }
+
+        private void Help_Click(object sender, RoutedEventArgs e)
+        {
+            HelpPopup.IsOpen = !HelpPopup.IsOpen;
+        }
+
+        private void GithubLink_RequestNavigate(object sender, RequestNavigateEventArgs e)
+        {
+            Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri)
+            {
+                UseShellExecute = true
+            });
+            e.Handled = true;
         }
     }
 }

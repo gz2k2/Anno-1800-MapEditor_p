@@ -812,9 +812,16 @@ namespace AnnoMapEditor.UI.Controls
 
         protected override void OnMouseRightButtonDown(MouseButtonEventArgs e)
         {
+            if (e.ChangedButton != MouseButton.Right)
+            {
+                base.OnMouseRightButtonDown(e);
+                return;
+            }
+
             rightclickDragging = true;
             dragPoint = e.GetPosition(this);
-            Mouse.Capture(this);
+            CaptureMouse();
+            Cursor = Cursors.SizeAll;
 
             e.Handled = true;
             base.OnMouseRightButtonDown(e);
@@ -822,15 +829,22 @@ namespace AnnoMapEditor.UI.Controls
 
         protected override void OnMouseRightButtonUp(MouseButtonEventArgs e)
         {
-            rightclickDragging = false; 
-            Mouse.Capture(null);
+            if (e.ChangedButton != MouseButton.Right)
+            {
+                base.OnMouseRightButtonUp(e);
+                return;
+            }
+
+            rightclickDragging = false;
             ReleaseMouseCapture();
+            Cursor = Cursors.Arrow;
+            e.Handled = true;
             base.OnMouseRightButtonUp(e);
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
         {
-            if (rightclickDragging)
+            if (rightclickDragging && e.RightButton == MouseButtonState.Pressed)
             {
                 Point dragOffset = e.GetPosition(this);
 
@@ -841,7 +855,9 @@ namespace AnnoMapEditor.UI.Controls
                 matrixTransform.Matrix = matrix;
                 dragPoint = dragOffset;
             }
-            e.Handled = true;
+
+            if (rightclickDragging)
+                e.Handled = true;
             base.OnMouseMove(e);
         }
 

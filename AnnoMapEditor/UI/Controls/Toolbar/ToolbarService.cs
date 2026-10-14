@@ -43,7 +43,7 @@ namespace AnnoMapEditor.UI.Controls.Toolbar
             get => _snapContinentalIslandsToCorners;
             set => SetProperty(ref _snapContinentalIslandsToCorners, value);
         }
-        private bool _snapContinentalIslandsToCorners = true;
+        private bool _snapContinentalIslandsToCorners = false;
 
         /********************************************
          * Properties for enabled or disabled buttons

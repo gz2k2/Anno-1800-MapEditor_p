@@ -118,11 +118,52 @@
         <Button IsEnabled="{Binding ToolbarService.ZoomOutButtonEnabled}" Style="{StaticResource ToolbarButton}" Content="&#xe71f;" Click="ZoomOut_Click"/>
         <Button IsEnabled="True" Style="{Binding ToolbarService.ShowLabelsButtonState, Converter={StaticResource IsActiveToToolbarButtonStyle}}" Content="&#xe8ec;" Click="ShowLabels_Click" ToolTip="Show island labels"/>
         <Border Width="8" Margin="0,4,7,4" BorderThickness =" 0,0,1,0" BorderBrush="#505050"/>
-        <Button IsEnabled="False" Style="{StaticResource ToolbarButton}" Content="&#xe897;"/>
         <Button IsEnabled="True" Style="{StaticResource ToolbarButton}" Content="&#xe713;" Click="CustomIslands_Click" ToolTip="Custom islands">
             <Button.ContextMenu>
                 <ContextMenu Name="ToolbarCustomIslandsContextMenu"/>
             </Button.ContextMenu>
         </Button>
+        <Popup Name="HelpPopup"
+               PlacementTarget="{Binding ElementName=HelpButton}"
+               Placement="Bottom"
+               StaysOpen="False"
+               AllowsTransparency="True">
+            <Border Background="{StaticResource MediumBackgroundBrush}"
+                    BorderBrush="{StaticResource BrightBorderBrush}"
+                    BorderThickness="1"
+                    Padding="14">
+                <StackPanel MinWidth="280">
+                    <TextBlock Text="Anno 1800 Map Editor"
+                               Style="{StaticResource DefaultLabelStyle}"
+                               FontSize="16"
+                               FontWeight="Bold" />
+                    <TextBlock Text="v0.7.21 - modified by gz2k2"
+                               Style="{StaticResource DefaultLabelStyle}"
+                               Margin="0,8,0,6" />
+                    <TextBlock Style="{StaticResource DefaultLabelStyle}">
+                        <Hyperlink NavigateUri="http://www.github.com/gz2k2"
+                                   RequestNavigate="GithubLink_RequestNavigate">
+                            http://www.github.com/gz2k2
+                        </Hyperlink>
+                    </TextBlock>
+                    <TextBlock Text="If you would like to support me for my work, feel free to leave me a small donation :)"
+                               Style="{StaticResource DefaultLabelStyle}"
+                               TextWrapping="Wrap"
+                               Margin="0,10,0,6" />
+                    <TextBlock Style="{StaticResource DefaultLabelStyle}">
+                        <Hyperlink NavigateUri="https://ko-fi.com/gz2k2"
+                                   RequestNavigate="GithubLink_RequestNavigate">
+                            https://ko-fi.com/gz2k2
+                        </Hyperlink>
+                    </TextBlock>
+                </StackPanel>
+            </Border>
+        </Popup>
+        <Button Name="HelpButton"
+                IsEnabled="True"
+                Style="{StaticResource ToolbarButton}"
+                Content="&#xe897;"
+                Click="Help_Click"
+                ToolTip="Help"/>
     </StackPanel>
 </UserControl>
