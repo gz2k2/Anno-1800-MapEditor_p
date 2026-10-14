@@ -202,26 +202,21 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
 
         private void UpdateBrushes()
         {
+            PinBrush = SlotAsset.GetRandomSlotType(SlotAssignment.Slot.ObjectGuid) switch
+            {
+                SlotAsset.RANDOM_MINE => Brushes.Gold,
+                SlotAsset.RANDOM_CLAY => Brushes.Orange,
+                SlotAsset.RANDOM_OIL => Brushes.LightBlue,
+                SlotAsset.RANDOM_GAS => Brushes.Red,
+                _ => Brushes.White
+            };
+
             if (AssignedSlot == _emptySlot)
             {
-                PinBrush = Brushes.LightGray;
                 BackgroundBrush = Brushes.Transparent;
             }
             else
             {
-                long randomSlotGuid = SlotAssignment.Slot.ObjectGuid;
-
-                if (SlotAsset.IsRandomMineSlot(randomSlotGuid))
-                    PinBrush = Brushes.Gray;
-                else if (SlotAsset.RANDOM_CLAY_GUIDS.Contains(randomSlotGuid))
-                    PinBrush = Brushes.Orange;
-                else if (SlotAsset.RANDOM_OIL_GUIDS.Contains(randomSlotGuid))
-                    PinBrush = Brushes.LightBlue;
-                else if (SlotAsset.RANDOM_GAS_GUIDS.Contains(randomSlotGuid))
-                    PinBrush = Brushes.LightBlue;
-                else if (SlotAsset.GetRandomSlotType(randomSlotGuid) == SlotAsset.RANDOM_CUSTOM)
-                    PinBrush = Brushes.Red;
-
                 BackgroundBrush = PinBrush;
             }
         }

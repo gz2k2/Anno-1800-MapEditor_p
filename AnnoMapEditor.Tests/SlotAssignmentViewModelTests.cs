@@ -30,7 +30,7 @@ public class SlotAssignmentViewModelTests
     }
 
     [Theory]
-    [InlineData(SlotAsset.RANDOM_MINE_NEW_WORLD_GUID, 0x808080)]
+    [InlineData(SlotAsset.RANDOM_MINE_NEW_WORLD_GUID, 0xFFD700)]
     [InlineData(SlotAsset.RANDOM_CLAY_GUID, 0xFFA500)]
     [InlineData(SlotAsset.RANDOM_OIL_GUID, 0xADD8E6)]
     public void RandomSlotTypeUsesDistinctLineColor(long randomSlotGuid, int expectedColor)
