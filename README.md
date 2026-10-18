@@ -1,84 +1,51 @@
-﻿# Community Map Editor for Anno 1800
+﻿# Anno 1800 Map Editor (Modded by gz2k2)
 
-This project is not affiliated in any way with Ubisoft.
+Welcome to the modded version of the Anno 1800 Map Editor by **gz2k2**. This version allows you to create, manage, and export custom maps with ease, including support for additional custom assets like material sets and graphics.
+*Fork of [anno-mods/AnnoMapEditor](https://github.com)*
 
-Anno 1800 and Anno 117 - Pax Romana are trademarks of Ubisoft Entertainment in the US and/or other countries.
-Anno is a trademark of Ubisoft GmbH in the US and/or other countries.
+## How to Include Custom Maps
 
-![](./doc/editor-v0.6.gif)
+### Configuration
+To use custom maps in the editor, you must first configure the **path inside the settings menu (gear icon)**. Once set up, your custom maps will be visible and listed directly within that menu.
 
-## Setup
+### Directory Structure Example
 
-You need to install [.NET 6](https://dotnet.microsoft.com/en-us/download/dotnet/6.0/runtime?cid=getdotnetcore) to run the application.
-If you don't have it yet it will prompt you to download it.
-Select "Run desktop apps, Download x64".
+Your custom map files must be placed inside a dedicated subfolder within the configured directory:
 
-Once started, the Editor will ask for your Anno installation path. Continue to the editor and you are presented with an empty map template.
+```text
+/maps/
+└── my_custom_maps/
+    ├── moderate_l_01_skinned.a7m
+    └── additional_files/
+        └── data/
+            ├── config/
+            │   └── engine/
+            │       └── material_sets/
+            │           └── xxx.xml
+            └── graphics/
+                └── props/
+                    └── your_custom_prop.cfg
+```
 
-## Features
+### Adding Additional Files (Auto-Export)
 
-- open map templates from the game, or extracted files (`.a7tinfo` and [FileDBReader](https://github.com/anno-mods/FileDBReader) `.xml`)
-- create entirely new map templates
-- rearrange, delete and add islands, change island pool type
-- modify mining slots and fertilities
-- undo and redo changes (currently not working with map size changes and group transform)
-- save as ready-to-play mod.
-- save as map template for manual modding
+Any files and folders placed inside the `additional_files` directory will be **automatically copied** into your final map folder during the export process. This is useful for bundling custom textures, properties, or configurations with your map.
 
-## How to Use
+* **Material Sets Example:** 
+  Place your custom material XML files here:
+  `/maps/my_custom_maps/additional_files/data/config/engine/material_sets/xxx.xml`
 
-Open an existing map or create a new one, change it to your liking and safe it as a mod.
+* **Graphics & Props Example:** 
+  Place your custom 3D models, textures, or prop configurations here:
+  `/maps/my_custom_maps/additional_files/data/graphics/props/...`
 
-Have a look at the [Modding Guide](https://github.com/anno-mods/modding-guide) if you need help how to create more complex map mods or even new sessions.
+## Fixes & Improvements (Compared to Original Version)
 
-Sometimes you will see some warnings on the left side:
+* **New World Map Export:** The export functionality for the New World map template now works completely without errors.
+* **Copy & Paste Functionality:** The copy and paste buttons are fully active. You can now duplicate and insert islands directly.
+* **Fertility Randomizer:** Added a dedicated, separate fertility randomizer designed specifically for custom maps.
 
-- Too many small/medium/large pool islands: The game uses every island variation only once.
-  If you have too many pool islands, the game will just omit the remaining ones.
-- Too many continental islands. More than 1 continental island may result in visual glitches.
-
-You can export the map anyways, but you might encounter unwanted behavior while playing on it.
-
-Keep in mind, third party and pirate slots may turn into small islands depending on game settings.
-
-## Roadmap
-
-- Compatibility with Anno 117 - Pax Romana (currently underway)
-- Quality of life enhancements
-- Optimized export-as-mod methods
-
-## Changelog
-
-### 0.6
-
-- Complete UI overhaul:
-  - New startup window with optimized asset loading
-  - Undo and Redo features
-  - Zooming (mousewheel) and panning (right click and drag)
-  - Visible slots on the map
-  - Streamlined fertility selection
-- General fixes and optimizations 
-
-### 0.5
-
-- Add, remove, change pool islands
-
-### 0.4
-
-- Move islands
-- Save as playable mod (Old World only)
-
-### 0.3
-
-- Save/export to `.a7tinfo` and `.xml` files
-
-### 0.2
-
-- Open maps from game archives
-- Auto-detect game data path
-
-## Notes
-
-This project uses:
-- [RDAExplorer](https://github.com/jakobharder/RDAExplorer) (custom .NET6 build without WinForms)
-- [FileDBReader](https://github.com/anno-mods/FileDBReader)
+## General Features
+* Support for custom subfolder organization.
+* Automatic asset bundling via the `additional_files` directory.
+* Tailored for advanced Anno 1800 map modding.
