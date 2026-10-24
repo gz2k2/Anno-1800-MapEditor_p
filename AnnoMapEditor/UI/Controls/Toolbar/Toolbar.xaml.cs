@@ -92,9 +92,24 @@ namespace AnnoMapEditor.UI.Controls.Toolbar
 
         private void CustomIslands_Click(object sender, RoutedEventArgs e)
         {
-            ToolbarService.Instance.ButtonContextClick(ToolbarButtonType.OpenSettingsWindow, sender);
+            ToolbarService.Instance.ButtonContextClick(ToolbarButtonType.ShowCustomIslandsMenu, sender);
             ToolbarCustomIslandsContextMenu.PlacementTarget = sender as UIElement;
             ToolbarCustomIslandsContextMenu.IsOpen = true;
+        }
+
+        private void Settings_Click(object sender, RoutedEventArgs e)
+        {
+            SettingsPopup.IsOpen = !SettingsPopup.IsOpen;
+        }
+
+        private void SelectTemplateFolder_Click(object sender, RoutedEventArgs e)
+        {
+            ToolbarService.Instance.ButtonClick(ToolbarButtonType.SelectTemplateFolder);
+        }
+
+        private void SelectCustomIslandFolder_Click(object sender, RoutedEventArgs e)
+        {
+            ToolbarService.Instance.ButtonClick(ToolbarButtonType.SelectCustomIslandsFolder);
         }
 
         private void Help_Click(object sender, RoutedEventArgs e)

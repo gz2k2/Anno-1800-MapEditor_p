@@ -196,9 +196,15 @@ namespace AnnoMapEditor.UI.Windows.Main
                     case ToolbarButtonType.SaveMap:
                         SaveMapFileDialog();
                         break;
-                    case ToolbarButtonType.OpenSettingsWindow:
+                    case ToolbarButtonType.ShowCustomIslandsMenu:
                         if (sender is Button { ContextMenu: not null } customIslandsButton)
                             PopulateCustomIslandMenu(customIslandsButton.ContextMenu);
+                        break;
+                    case ToolbarButtonType.SelectTemplateFolder:
+                        SelectTemplateFolder();
+                        break;
+                    case ToolbarButtonType.SelectCustomIslandsFolder:
+                        SelectCustomIslandFolder();
                         break;
                     default: break;
                 }
@@ -291,11 +297,6 @@ namespace AnnoMapEditor.UI.Windows.Main
         {
             menu.Items.Clear();
 
-            MenuItem selectFolder = new() { Header = "Custom-island folder..." };
-            selectFolder.Click += (_, _) => SelectCustomIslandFolder();
-            menu.Items.Add(selectFolder);
-            menu.Items.Add(new Separator());
-
             if (CustomIslandCatalog.Instance.Islands.Count == 0)
             {
                 menu.Items.Add(new MenuItem { Header = "no Custom Islands loaded", IsEnabled = false });
@@ -384,6 +385,20 @@ namespace AnnoMapEditor.UI.Windows.Main
             }
         }
 
+        private void SelectTemplateFolder()
+        {
+            var picker = new Ookii.Dialogs.Wpf.VistaFolderBrowserDialog
+            {
+                UseDescriptionForTitle = true,
+                Description = "Select the default folder for map template files"
+            };
+            if (!string.IsNullOrWhiteSpace(Settings.Instance.TemplateFolderPath))
+                picker.SelectedPath = Settings.Instance.TemplateFolderPath;
+
+            if (true == picker.ShowDialog())
+                Settings.Instance.TemplateFolderPath = picker.SelectedPath;
+        }
+
         private void AddCustomIsland(IslandAsset island)
         {
             try
@@ -413,7 +428,8 @@ namespace AnnoMapEditor.UI.Windows.Main
         {
             var picker = new OpenFileDialog
             {
-                Filter = "Map templates (*.a7tinfo, *.xml)|*.a7tinfo;*.xml"
+                Filter = "Map templates (*.a7tinfo, *.xml)|*.a7tinfo;*.xml",
+                InitialDirectory = Settings.Instance.TemplateFolderPath
             };
 
             if (true == picker.ShowDialog())
@@ -436,6 +452,7 @@ namespace AnnoMapEditor.UI.Windows.Main
                 Filter = "Map template (*.a7tinfo)|*.a7tinfo|XML map template (*.xml)|*.xml",
                 FilterIndex = Path.GetExtension(MapTemplateFilePath)?.ToLower() == ".xml" ? 2 : 1,
                 FileName = Path.GetFileName(MapTemplateFilePath),
+                InitialDirectory = Settings.Instance.TemplateFolderPath,
                 OverwritePrompt = true
             };
 

@@ -117,7 +117,9 @@ namespace AnnoMapEditor.UI.Controls.Toolbar
         ZoomIn,
         ZoomOut,
         ShowLabels,
+        ShowCustomIslandsMenu,
         OpenHelpWindow,
-        OpenSettingsWindow
+        SelectTemplateFolder,
+        SelectCustomIslandsFolder
     }
 }

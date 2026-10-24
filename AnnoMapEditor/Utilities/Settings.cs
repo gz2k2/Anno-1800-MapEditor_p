@@ -101,6 +101,20 @@ namespace AnnoMapEditor.Utilities
             }
         }
 
+        public string? TemplateFolderPath
+        {
+            get => UserSettings.Default.TemplateFolderPath;
+            set
+            {
+                if (value != TemplateFolderPath)
+                {
+                    UserSettings.Default.TemplateFolderPath = value;
+                    UserSettings.Default.Save();
+                    OnPropertyChanged(nameof(TemplateFolderPath));
+                }
+            }
+        }
+
 
         private Settings()
         {

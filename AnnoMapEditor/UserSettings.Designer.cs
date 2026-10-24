@@ -118,5 +118,17 @@ namespace AnnoMapEditor {
                 this["CustomIslandsPath"] = value;
             }
         }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string TemplateFolderPath {
+            get {
+                return ((string)(this["TemplateFolderPath"]));
+            }
+            set {
+                this["TemplateFolderPath"] = value;
+            }
+        }
     }
 }
