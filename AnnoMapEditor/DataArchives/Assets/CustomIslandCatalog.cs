@@ -33,15 +33,14 @@ namespace AnnoMapEditor.DataArchives.Assets
         public async Task RefreshAsync()
         {
             Islands.Clear();
-            string? root = Settings.Instance.CustomIslandsPath;
-            if (string.IsNullOrWhiteSpace(root) || !Directory.Exists(root))
-                return;
-
             // Search recursively: creators commonly group islands by region or author below the
             // configured root. An island is identified by its a7m and matching sidecars, not by
             // the name of its parent directory.
-            foreach (string a7m in Directory.EnumerateFiles(root, "*.a7m", SearchOption.AllDirectories))
+            foreach (MapPackage package in Settings.Instance.MapPackages.Where(package => Directory.Exists(package.CustomMapFolder)))
             {
+                string root = package.CustomMapFolder;
+                foreach (string a7m in Directory.EnumerateFiles(root, "*.a7m", SearchOption.AllDirectories))
+                {
                 string directory = Path.GetDirectoryName(a7m)!;
                 string name = Path.GetFileNameWithoutExtension(a7m);
                 string a7minfo = Path.ChangeExtension(a7m, ".a7minfo");
@@ -84,11 +83,13 @@ namespace AnnoMapEditor.DataArchives.Assets
                     }
 
                     string relativeDirectory = Path.GetRelativePath(root, directory);
-                    string virtualPath = Path.Combine("data", "ame", "sessions", "islands", "pool", "custom", relativeDirectory, name + ".a7m");
+                    string virtualPath = Path.Combine("data", "ame", "custom", package.Id, relativeDirectory, name + ".a7m");
                     IslandAsset island = new()
                     {
                         FilePath = virtualPath,
                         CustomSourceDirectory = directory,
+                        CustomFilesDirectory = string.IsNullOrWhiteSpace(package.CustomFilesFolder) ? null : package.CustomFilesFolder,
+                        CustomPackageName = package.Name,
                         DisplayName = name,
                         Thumbnail = fixedIsland.Thumbnail,
                         Region = RegionAsset.DetectFromPath(name) ?? RegionAsset.CreateTestRegion(),
@@ -107,6 +108,7 @@ namespace AnnoMapEditor.DataArchives.Assets
                 catch (Exception ex)
                 {
                     DataManager._logger.LogWarning($"Could not load custom island '{directory}': {ex.Message}");
+                }
                 }
             }
         }

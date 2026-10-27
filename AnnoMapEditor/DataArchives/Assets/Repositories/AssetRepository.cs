@@ -119,7 +119,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
             var hash = hasher.ComputeHash(assetsXmlStream);
             var hashB64 = Convert.ToBase64String(hash);
             assetsXmlStream.Seek(0, SeekOrigin.Begin);
-            bool validCache = UserSettings.Default.AssetsHash == hashB64 && UserSettings.Default.Xpath == xpath;
+            bool validCache = Settings.Instance.AssetsHash == hashB64 && Settings.Instance.Xpath == xpath;
             _logger.LogInformation($"Computed Hash at {watch.Elapsed.TotalMilliseconds} ms");
 
             if (validCache)
@@ -140,9 +140,8 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
 
             if (!validCache)
             {
-                UserSettings.Default.AssetsHash = hashB64;
-                UserSettings.Default.Xpath = xpath; 
-                UserSettings.Default.Save();
+                Settings.Instance.AssetsHash = hashB64;
+                Settings.Instance.Xpath = xpath;
                 assetsXmlStream.Dispose();
                 await Task.Run(() => RenewCache(assets));
             }

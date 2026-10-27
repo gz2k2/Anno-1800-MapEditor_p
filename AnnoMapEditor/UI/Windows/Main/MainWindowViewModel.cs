@@ -303,25 +303,15 @@ namespace AnnoMapEditor.UI.Windows.Main
                 return;
             }
 
-            Dictionary<string, MenuItem> groupMenus = new(StringComparer.OrdinalIgnoreCase);
-            foreach ((string? groupPath, string? groupName, IslandAsset island) in GroupCustomIslands(
-                CustomIslandCatalog.Instance.Islands,
-                Settings.Instance.CustomIslandsPath))
+            foreach (IGrouping<string, IslandAsset> package in CustomIslandCatalog.Instance.Islands
+                .OrderBy(island => island.CustomPackageName ?? "Custom Islands", StringComparer.OrdinalIgnoreCase)
+                .ThenBy(island => island.DisplayName, StringComparer.OrdinalIgnoreCase)
+                .GroupBy(island => string.IsNullOrWhiteSpace(island.CustomPackageName) ? "Custom Islands" : island.CustomPackageName!, StringComparer.OrdinalIgnoreCase))
             {
-                if (groupPath is null)
-                {
-                    AddCustomIslandMenuItem(menu, island);
-                    continue;
-                }
-
-                if (!groupMenus.TryGetValue(groupPath, out MenuItem? groupMenu))
-                {
-                    groupMenu = new MenuItem { Header = groupName };
-                    groupMenus.Add(groupPath, groupMenu);
-                    menu.Items.Add(groupMenu);
-                }
-
-                AddCustomIslandMenuItem(groupMenu, island);
+                MenuItem packageMenu = new() { Header = package.Key };
+                menu.Items.Add(packageMenu);
+                foreach (IslandAsset island in package)
+                    AddCustomIslandMenuItem(packageMenu, island);
             }
         }
 

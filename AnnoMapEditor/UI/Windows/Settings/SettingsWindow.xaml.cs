@@ -1,0 +1,86 @@
+using AnnoMapEditor.Utilities;
+using AnnoMapEditor.DataArchives.Assets;
+using Ookii.Dialogs.Wpf;
+using System.Windows;
+using System.ComponentModel;
+using System.Windows.Data;
+
+namespace AnnoMapEditor.UI.Windows.Configuration
+{
+    public partial class SettingsWindow : Window
+    {
+        public SettingsWindow()
+        {
+            InitializeComponent();
+            DataContext = Settings.Instance;
+            ICollectionView packagesView = CollectionViewSource.GetDefaultView(Settings.Instance.MapPackages);
+            packagesView.SortDescriptions.Add(new SortDescription(nameof(MapPackage.Name), ListSortDirection.Ascending));
+            if (packagesView is ICollectionViewLiveShaping liveShaping && liveShaping.CanChangeLiveSorting)
+                liveShaping.IsLiveSorting = true;
+        }
+
+        private void SelectTemplateFolder_Click(object sender, RoutedEventArgs e)
+        {
+            VistaFolderBrowserDialog picker = new()
+            {
+                UseDescriptionForTitle = true,
+                Description = "Select the default folder for map template files",
+                SelectedPath = Settings.Instance.TemplateFolderPath
+            };
+
+            if (true == picker.ShowDialog(this))
+                Settings.Instance.TemplateFolderPath = picker.SelectedPath;
+        }
+
+        private void AddPackage_Click(object sender, RoutedEventArgs e)
+        {
+            MapPackage package = new();
+            Settings.Instance.MapPackages.Add(package);
+            PackagesGrid.SelectedItem = package;
+        }
+
+        private void DeletePackage_Click(object sender, RoutedEventArgs e)
+        {
+            if (PackagesGrid.SelectedItem is MapPackage package)
+                Settings.Instance.MapPackages.Remove(package);
+        }
+
+        private void SelectCustomMapFolder_Click(object sender, RoutedEventArgs e)
+        {
+            if (PackagesGrid.SelectedItem is not MapPackage package)
+                return;
+            VistaFolderBrowserDialog picker = new()
+            {
+                UseDescriptionForTitle = true,
+                Description = "Select the folder containing this package's custom maps",
+                SelectedPath = package.CustomMapFolder
+            };
+
+            if (true == picker.ShowDialog(this))
+                package.CustomMapFolder = picker.SelectedPath;
+        }
+
+        private void SelectCustomFilesFolder_Click(object sender, RoutedEventArgs e)
+        {
+            if (PackagesGrid.SelectedItem is not MapPackage package)
+                return;
+            VistaFolderBrowserDialog picker = new()
+            {
+                UseDescriptionForTitle = true,
+                Description = "Select the files to export with this map package",
+                SelectedPath = package.CustomFilesFolder
+            };
+
+            if (true == picker.ShowDialog(this))
+                package.CustomFilesFolder = picker.SelectedPath;
+        }
+
+        private async void Close_Click(object sender, RoutedEventArgs e)
+        {
+            PackagesGrid.CommitEdit();
+            Settings.Instance.SaveMapPackages();
+            await CustomIslandCatalog.Instance.RefreshAsync();
+            Close();
+        }
+    }
+}

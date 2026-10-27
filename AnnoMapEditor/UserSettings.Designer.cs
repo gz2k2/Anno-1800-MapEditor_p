@@ -121,6 +121,18 @@ namespace AnnoMapEditor {
 
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("[]")]
+        public string MapPackages {
+            get {
+                return ((string)(this["MapPackages"]));
+            }
+            set {
+                this["MapPackages"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string TemplateFolderPath {
             get {

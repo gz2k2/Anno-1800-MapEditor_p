@@ -205,27 +205,22 @@ namespace AnnoMapEditor.Mods.Serialization
         }
 
         /// <summary>
-        /// Copies the optional shared assets belonging to custom-island collections. A collection
-        /// places its islands in child directories and may provide an <c>additional_files</c>
-        /// sibling directory whose contents already start at <c>data</c>.
+        /// Copies the shared custom files of every map package used in this export.
         /// </summary>
         internal static void CopyAdditionalFiles(MapTemplate mapTemplate, string modPath)
         {
-            IEnumerable<string> collectionDirectories = mapTemplate.Elements
+            IEnumerable<string> customFilesDirectories = mapTemplate.Elements
                 .OfType<FixedIslandElement>()
-                .Select(element => element.IslandAsset.CustomSourceDirectory)
-                .Where(directory => !string.IsNullOrWhiteSpace(directory))
-                .Select(directory => Path.GetDirectoryName(Path.TrimEndingDirectorySeparator(directory!)))
+                .Select(element => element.IslandAsset.CustomFilesDirectory)
                 .Where(directory => !string.IsNullOrWhiteSpace(directory))
                 .Distinct(StringComparer.OrdinalIgnoreCase)!;
 
-            foreach (string collectionDirectory in collectionDirectories)
+            foreach (string customFilesDirectory in customFilesDirectories)
             {
-                string additionalFilesDirectory = Path.Combine(collectionDirectory, "additional_files");
-                if (!Directory.Exists(additionalFilesDirectory))
+                if (!Directory.Exists(customFilesDirectory))
                     continue;
 
-                CopyDirectoryContents(additionalFilesDirectory, modPath);
+                CopyDirectoryContents(customFilesDirectory, modPath);
             }
         }
 

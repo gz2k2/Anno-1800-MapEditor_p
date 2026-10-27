@@ -3,6 +3,7 @@ using System.Windows.Controls;
 using AnnoMapEditor.Utilities.UndoRedo;
 using System.Diagnostics;
 using System.Windows.Navigation;
+using AnnoMapEditor.UI.Windows.Configuration;
 
 namespace AnnoMapEditor.UI.Controls.Toolbar
 {
@@ -99,17 +100,11 @@ namespace AnnoMapEditor.UI.Controls.Toolbar
 
         private void Settings_Click(object sender, RoutedEventArgs e)
         {
-            SettingsPopup.IsOpen = !SettingsPopup.IsOpen;
-        }
-
-        private void SelectTemplateFolder_Click(object sender, RoutedEventArgs e)
-        {
-            ToolbarService.Instance.ButtonClick(ToolbarButtonType.SelectTemplateFolder);
-        }
-
-        private void SelectCustomIslandFolder_Click(object sender, RoutedEventArgs e)
-        {
-            ToolbarService.Instance.ButtonClick(ToolbarButtonType.SelectCustomIslandsFolder);
+            SettingsWindow settingsWindow = new()
+            {
+                Owner = Window.GetWindow(this)
+            };
+            settingsWindow.ShowDialog();
         }
 
         private void Help_Click(object sender, RoutedEventArgs e)

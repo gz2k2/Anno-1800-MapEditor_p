@@ -30,5 +30,11 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
 
         /// <summary>Local island directory to copy when exporting a custom island.</summary>
         public string? CustomSourceDirectory { get; init; }
+
+        /// <summary>Shared package files to include when this custom island is exported.</summary>
+        public string? CustomFilesDirectory { get; init; }
+
+        /// <summary>Name of the map package this custom island belongs to.</summary>
+        public string? CustomPackageName { get; init; }
     }
 }

@@ -1,144 +1,132 @@
-﻿using Microsoft.Win32;
+using Microsoft.Win32;
+using Newtonsoft.Json;
+using System;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.IO;
 
 namespace AnnoMapEditor.Utilities
 {
     public class Settings : ObservableBase
     {
+        private const string ConfigFileName = "config.json";
+        private readonly EditorConfiguration _configuration;
         public static Settings Instance { get; } = new();
+        public ObservableCollection<MapPackage> MapPackages { get; } = new();
+        public string ConfigPath => Path.Combine(AppContext.BaseDirectory, ConfigFileName);
 
-        public bool Quickstart
+        public bool Quickstart { get => _configuration.Quickstart; set => Set(value, nameof(Quickstart)); }
+        public string? GamePath
         {
-            get => UserSettings.Default.Quickstart;
+            get => _configuration.GamePath;
             set
             {
-                if (value != Quickstart)
+                if (value == GamePath) return;
+                _configuration.GamePath = value;
+                if (value != null)
                 {
-                    UserSettings.Default.Quickstart = value;
-                    UserSettings.Default.Save();
-                    OnPropertyChanged(nameof(Quickstart));
+                    if (DataPath == null || !EnableExpertMode) _configuration.DataPath = Path.Combine(value, "maindata");
+                    if (ModsPath == null || !EnableExpertMode) _configuration.ModsPath = Path.Combine(value, "mods");
                 }
+                Save();
+                OnPropertyChanged(nameof(GamePath));
+                OnPropertyChanged(nameof(DataPath));
+                OnPropertyChanged(nameof(ModsPath));
             }
         }
-
-        public string? GamePath 
-        {
-            get => UserSettings.Default.GamePath;
-            set
-            {
-                if (value != GamePath)
-                {
-                    UserSettings.Default.GamePath = value;
-                    UserSettings.Default.Save();
-
-                    if (value != null)
-                    {
-                        if (DataPath == null || !EnableExpertMode)
-                            DataPath = Path.Combine(value, "maindata");
-
-                        if (ModsPath == null || !EnableExpertMode)
-                            ModsPath = Path.Combine(value, "mods");
-                    }
-
-                    OnPropertyChanged(nameof(GamePath));
-                }
-            }
-        }
-
-        public string? DataPath
-        {
-            get => UserSettings.Default.DataPath;
-            set
-            {
-                if (value != DataPath)
-                {
-                    UserSettings.Default.DataPath = value;
-                    UserSettings.Default.Save();
-                    OnPropertyChanged(nameof(DataPath));
-                }
-            }
-        }
-
-        public string? ModsPath
-        {
-            get => UserSettings.Default.ModsPath;
-            set
-            {
-                if (value != ModsPath)
-                {
-                    UserSettings.Default.ModsPath = value;
-                    UserSettings.Default.Save();
-                    OnPropertyChanged(nameof(ModsPath));
-                }
-            }
-        }
-
-        public bool EnableExpertMode
-        {
-            get => UserSettings.Default.EnableExpertMode;
-            set
-            {
-                if (value != EnableExpertMode)
-                {
-                    UserSettings.Default.EnableExpertMode = value;
-                    UserSettings.Default.Save();
-                    OnPropertyChanged(nameof(EnableExpertMode));
-                }
-            }
-        }
-
-        public string? CustomIslandsPath
-        {
-            get => UserSettings.Default.CustomIslandsPath;
-            set
-            {
-                if (value != CustomIslandsPath)
-                {
-                    UserSettings.Default.CustomIslandsPath = value;
-                    UserSettings.Default.Save();
-                    OnPropertyChanged(nameof(CustomIslandsPath));
-                }
-            }
-        }
-
-        public string? TemplateFolderPath
-        {
-            get => UserSettings.Default.TemplateFolderPath;
-            set
-            {
-                if (value != TemplateFolderPath)
-                {
-                    UserSettings.Default.TemplateFolderPath = value;
-                    UserSettings.Default.Save();
-                    OnPropertyChanged(nameof(TemplateFolderPath));
-                }
-            }
-        }
-
+        public string? DataPath { get => _configuration.DataPath; set => Set(value, nameof(DataPath)); }
+        public string? ModsPath { get => _configuration.ModsPath; set => Set(value, nameof(ModsPath)); }
+        public bool EnableExpertMode { get => _configuration.EnableExpertMode; set => Set(value, nameof(EnableExpertMode)); }
+        public string? CustomIslandsPath { get => _configuration.CustomIslandsPath; set => Set(value, nameof(CustomIslandsPath)); }
+        public string? TemplateFolderPath { get => _configuration.TemplateFolderPath; set => Set(value, nameof(TemplateFolderPath)); }
+        public string? AssetsHash { get => _configuration.AssetsHash; set => Set(value, nameof(AssetsHash)); }
+        public string? Xpath { get => _configuration.Xpath; set => Set(value, nameof(Xpath)); }
 
         private Settings()
         {
-            if (GamePath == null)
-                GamePath = GetInstallDirFromRegistry();
+            _configuration = LoadConfiguration();
+            foreach (MapPackage package in _configuration.MapPackages) MapPackages.Add(package);
+            if (MapPackages.Count == 0 && !string.IsNullOrWhiteSpace(CustomIslandsPath))
+                MapPackages.Add(new MapPackage { Name = "Migrated package", CustomMapFolder = CustomIslandsPath });
+            MapPackages.CollectionChanged += MapPackages_CollectionChanged;
+            foreach (MapPackage package in MapPackages) package.PropertyChanged += MapPackage_PropertyChanged;
+            if (GamePath == null) _configuration.GamePath = GetInstallDirFromRegistry();
+            Save();
         }
 
+        private EditorConfiguration LoadConfiguration()
+        {
+            try
+            {
+                if (File.Exists(ConfigPath))
+                    return JsonConvert.DeserializeObject<EditorConfiguration>(File.ReadAllText(ConfigPath)) ?? new EditorConfiguration();
+            }
+            catch (IOException) { }
+            catch (JsonException) { }
+
+            return new EditorConfiguration
+            {
+                Quickstart = UserSettings.Default.Quickstart,
+                GamePath = UserSettings.Default.GamePath,
+                DataPath = UserSettings.Default.DataPath,
+                ModsPath = UserSettings.Default.ModsPath,
+                EnableExpertMode = UserSettings.Default.EnableExpertMode,
+                CustomIslandsPath = UserSettings.Default.CustomIslandsPath,
+                TemplateFolderPath = UserSettings.Default.TemplateFolderPath,
+                AssetsHash = UserSettings.Default.AssetsHash,
+                Xpath = UserSettings.Default.Xpath,
+                MapPackages = DeserializeLegacyPackages(UserSettings.Default.MapPackages)
+            };
+        }
+
+        private static Collection<MapPackage> DeserializeLegacyPackages(string json)
+        {
+            try { return new Collection<MapPackage>(JsonConvert.DeserializeObject<MapPackage[]>(json ?? "[]") ?? Array.Empty<MapPackage>()); }
+            catch (JsonException) { return new Collection<MapPackage>(); }
+        }
+
+        private void Set<T>(T value, string propertyName)
+        {
+            var property = typeof(EditorConfiguration).GetProperty(propertyName)!;
+            if (Equals(property.GetValue(_configuration), value)) return;
+            property.SetValue(_configuration, value);
+            Save();
+            OnPropertyChanged(propertyName);
+        }
+
+        private void MapPackages_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.OldItems != null) foreach (MapPackage package in e.OldItems) package.PropertyChanged -= MapPackage_PropertyChanged;
+            if (e.NewItems != null) foreach (MapPackage package in e.NewItems) package.PropertyChanged += MapPackage_PropertyChanged;
+            Save();
+        }
+        private void MapPackage_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) => Save();
+        public void SaveMapPackages() => Save();
+        private void Save()
+        {
+            _configuration.MapPackages = new Collection<MapPackage>(MapPackages);
+            File.WriteAllText(ConfigPath, JsonConvert.SerializeObject(_configuration, Formatting.Indented));
+        }
 
         public static string? GetInstallDirFromRegistry()
         {
-            string installDirKey = @"SOFTWARE\WOW6432Node\Ubisoft\Anno 1800";
-            using RegistryKey? key = Registry.LocalMachine.OpenSubKey(installDirKey);
-
+            using RegistryKey? key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\WOW6432Node\Ubisoft\Anno 1800");
             string? installDir = key?.GetValue("InstallDir") as string;
-            if (installDir == null)
-                return null;
-
-            if (!installDir.Contains(Path.DirectorySeparatorChar))
-            {
-                char wrongSeparator = Path.DirectorySeparatorChar == '/' ? '\\' : '/';
-                return installDir.Replace(wrongSeparator, Path.DirectorySeparatorChar);
-            }
-            else
-                return installDir;
+            return installDir?.Replace(Path.DirectorySeparatorChar == '/' ? '\\' : '/', Path.DirectorySeparatorChar);
         }
+    }
+
+    public class EditorConfiguration
+    {
+        public bool Quickstart { get; set; }
+        public string? GamePath { get; set; }
+        public string? DataPath { get; set; }
+        public string? ModsPath { get; set; }
+        public bool EnableExpertMode { get; set; }
+        public string? CustomIslandsPath { get; set; }
+        public string? TemplateFolderPath { get; set; }
+        public string? AssetsHash { get; set; }
+        public string? Xpath { get; set; }
+        public Collection<MapPackage> MapPackages { get; set; } = new();
     }
 }
