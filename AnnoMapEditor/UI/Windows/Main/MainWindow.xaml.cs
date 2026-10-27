@@ -34,16 +34,7 @@ namespace AnnoMapEditor.UI.Windows.Main
             WindowChrome.SetIsHitTestVisibleInChrome(maximizeButton, true);
             WindowChrome.SetIsHitTestVisibleInChrome(ToolbarControl, true);
 
-            var exePath = Path.Join(AppContext.BaseDirectory, "AnnoMapEditor.exe");
-            var productVersion = "";
-            if (File.Exists(exePath))
-            {
-                try
-                {
-                    productVersion = FileVersionInfo.GetVersionInfo(exePath).ProductVersion ?? "";
-                }
-                catch { }
-            }
+            string productVersion = App.Version;
             title = $"{App.Title} {productVersion}";
             versionStatusText.Text = $"Version: {productVersion}";
             Title = title;

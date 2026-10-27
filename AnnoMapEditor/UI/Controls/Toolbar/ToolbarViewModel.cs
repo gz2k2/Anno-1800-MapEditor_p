@@ -7,6 +7,7 @@ namespace AnnoMapEditor.UI.Controls.Toolbar
         public UndoRedoStack UndoRedoStack => UndoRedoStack.Instance;
         public ToolbarService ToolbarService => ToolbarService.Instance;
         public AnnoMapEditor.Utilities.Settings Settings => AnnoMapEditor.Utilities.Settings.Instance;
+        public string Version => App.Version;
         
     }
 }

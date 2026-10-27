@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
+using System.Reflection;
 using System.Windows;
 using WPFLocalizeExtension.Engine;
 using WPFLocalizeExtension.Providers;
@@ -10,6 +11,8 @@ namespace AnnoMapEditor
     {
         public readonly static string TitleShort = "Community Map Editor";
         public readonly static string Title = $"{TitleShort} for Anno 1800";
+        public static string Version => typeof(App).Assembly
+            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "Unknown version";
 
         public static bool ConfirmClose()
         {

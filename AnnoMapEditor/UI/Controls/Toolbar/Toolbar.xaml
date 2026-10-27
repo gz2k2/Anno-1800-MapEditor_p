@@ -137,7 +137,7 @@
                                Style="{StaticResource DefaultLabelStyle}"
                                FontSize="16"
                                FontWeight="Bold" />
-                    <TextBlock Text="v0.7.59 - modified by gz2k2"
+                    <TextBlock Text="{Binding Version}"
                                Style="{StaticResource DefaultLabelStyle}"
                                Margin="0,8,0,6" />
                     <TextBlock Style="{StaticResource DefaultLabelStyle}">

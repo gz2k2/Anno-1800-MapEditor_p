@@ -1,6 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <Version>0.7.59</Version>
+    <FileVersion>$(Version)</FileVersion>
+    <InformationalVersion>v$(Version) - modified by gz2k2</InformationalVersion>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0-windows10.0.17763.0</TargetFramework>
     <Nullable>enable</Nullable>
@@ -16,17 +19,6 @@
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
   </PropertyGroup>
 
-  <!-- use git describe to set assembly version -->
-  <Target Name="SetGitVersion" BeforeTargets="InitializeSourceControlInformation">
-    <Exec Command="git describe --tags" ConsoleToMSBuild="True" IgnoreExitCode="True">
-      <Output PropertyName="GitDescribe" TaskParameter="ConsoleOutput" />
-    </Exec>
-    <PropertyGroup>
-      <!-- <AssemblyVersion>$(GitDescribe)</AssemblyVersion> -->
-      <FileVersion>$(GitDescribe)</FileVersion>
-      <InformationalVersion>$(GitDescribe)</InformationalVersion>
-    </PropertyGroup>
-  </Target>
   <ItemGroup>
     <None Remove="Assets\maptype.png" />
   </ItemGroup>
