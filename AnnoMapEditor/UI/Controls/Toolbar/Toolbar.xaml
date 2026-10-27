@@ -68,7 +68,7 @@
         <Button IsEnabled="True" Style="{StaticResource ToolbarButton}" Content="&#xe792;" Click="SaveMap_Click" ToolTip="Save map template file"/>
         <Button IsEnabled="True" Style="{StaticResource ToolbarButton}" Content="&#xe898;" Click="ExportMap_Click" ToolTip="Export as Mod"/>
         <Border Width="8" Margin="0,4,7,4" BorderThickness =" 0,0,1,0" BorderBrush="#505050"/>
-        <Button IsEnabled="True" Style="{StaticResource ToolbarButton}" Content="&#xe710;" Click="CustomIslands_Click" ToolTip="Add custom Island">
+        <Button IsEnabled="True" Style="{StaticResource ToolbarButton}" Content="&#xe710;" Click="CustomIslands_Click" ToolTip="Add Custom Island">
             <Button.ContextMenu>
                 <ContextMenu Name="ToolbarCustomIslandsContextMenu"/>
             </Button.ContextMenu>
@@ -137,7 +137,7 @@
                                Style="{StaticResource DefaultLabelStyle}"
                                FontSize="16"
                                FontWeight="Bold" />
-                    <TextBlock Text="v0.7.21 - modified by gz2k2"
+                    <TextBlock Text="v0.7.59 - modified by gz2k2"
                                Style="{StaticResource DefaultLabelStyle}"
                                Margin="0,8,0,6" />
                     <TextBlock Style="{StaticResource DefaultLabelStyle}">
