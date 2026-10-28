@@ -1,4 +1,4 @@
-﻿using AnnoMapEditor.DataArchives;
+using AnnoMapEditor.DataArchives;
 using AnnoMapEditor.DataArchives.Assets;
 using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.DataArchives.Assets.Repositories;
@@ -16,9 +16,12 @@ namespace AnnoMapEditor.UI.Overlays.SelectIsland
         public event IslandSelectedEventHandler? IslandSelected;
 
 
+        // The Fixed-island picker must only show islands loaded from the original game data.
+        // Custom islands are injected into IslandRepository after a custom package refresh, so
+        // explicitly exclude every IslandAsset that has a local custom source directory.
         public IEnumerable<IslandAsset> Islands { get; } = DataManager.Instance.IsInitialized
-            ? DataManager.Instance.IslandRepository
-            : CustomIslandCatalog.Instance.Islands;
+            ? DataManager.Instance.IslandRepository.Where(island => string.IsNullOrWhiteSpace(island.CustomSourceDirectory))
+            : Enumerable.Empty<IslandAsset>();
 
         public string? PathFilter 
         { 
