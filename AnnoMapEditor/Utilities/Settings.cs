@@ -39,6 +39,11 @@ namespace AnnoMapEditor.Utilities
         public bool EnableExpertMode { get => _configuration.EnableExpertMode; set => Set(value, nameof(EnableExpertMode)); }
         public string? CustomIslandsPath { get => _configuration.CustomIslandsPath; set => Set(value, nameof(CustomIslandsPath)); }
         public string? TemplateFolderPath { get => _configuration.TemplateFolderPath; set => Set(value, nameof(TemplateFolderPath)); }
+        public string? OldWorldGuid { get => _configuration.OldWorldGuid; set => Set(value, nameof(OldWorldGuid)); }
+        public string? NewWorldGuid { get => _configuration.NewWorldGuid; set => Set(value, nameof(NewWorldGuid)); }
+        public string? SunkenTreasuresGuid { get => _configuration.SunkenTreasuresGuid; set => Set(value, nameof(SunkenTreasuresGuid)); }
+        public string? ArcticGuid { get => _configuration.ArcticGuid; set => Set(value, nameof(ArcticGuid)); }
+        public string? EnbesaGuid { get => _configuration.EnbesaGuid; set => Set(value, nameof(EnbesaGuid)); }
         public string? AssetsHash { get => _configuration.AssetsHash; set => Set(value, nameof(AssetsHash)); }
         public string? Xpath { get => _configuration.Xpath; set => Set(value, nameof(Xpath)); }
 
@@ -125,6 +130,11 @@ namespace AnnoMapEditor.Utilities
         public bool EnableExpertMode { get; set; }
         public string? CustomIslandsPath { get; set; }
         public string? TemplateFolderPath { get; set; }
+        public string? OldWorldGuid { get; set; }
+        public string? NewWorldGuid { get; set; }
+        public string? SunkenTreasuresGuid { get; set; }
+        public string? ArcticGuid { get; set; }
+        public string? EnbesaGuid { get; set; }
         public string? AssetsHash { get; set; }
         public string? Xpath { get; set; }
         public Collection<MapPackage> MapPackages { get; set; } = new();

@@ -12,96 +12,266 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../../Resources/Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <!-- Settings-local dark TabControl theme. -->
+            <Style x:Key="SettingsTabItemStyle" TargetType="{x:Type TabItem}">
+                <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
+                <Setter Property="Background" Value="{StaticResource MediumBackgroundBrush}" />
+                <Setter Property="BorderBrush" Value="{StaticResource BrightBorderBrush}" />
+                <Setter Property="Padding" Value="16,8" />
+                <Setter Property="Margin" Value="0,0,2,0" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type TabItem}">
+                            <Border x:Name="TabBorder"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="1,1,1,0"
+                                    CornerRadius="3,3,0,0"
+                                    Padding="{TemplateBinding Padding}">
+                                <ContentPresenter ContentSource="Header"
+                                                  HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="TabBorder" Property="Background" Value="{StaticResource MouseoverBackgroundBrush}" />
+                                </Trigger>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter TargetName="TabBorder" Property="Background" Value="{StaticResource SelectedBackgroundBrush}" />
+                                    <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Foreground" Value="{StaticResource DisabledBrush}" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="SettingsTabControlStyle" TargetType="{x:Type TabControl}">
+                <Setter Property="Background" Value="{StaticResource DarkBackgroundBrush}" />
+                <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
+                <Setter Property="BorderBrush" Value="{StaticResource BrightBorderBrush}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="ItemContainerStyle" Value="{StaticResource SettingsTabItemStyle}" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type TabControl}">
+                            <Grid KeyboardNavigation.TabNavigation="Local">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+                                <TabPanel Grid.Row="0"
+                                          IsItemsHost="True"
+                                          Background="{StaticResource DarkBackgroundBrush}"
+                                          Margin="0,0,0,-1"
+                                          KeyboardNavigation.TabIndex="1" />
+                                <Border Grid.Row="1"
+                                        Background="{TemplateBinding Background}"
+                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                        Padding="0"
+                                        KeyboardNavigation.TabNavigation="Local"
+                                        KeyboardNavigation.DirectionalNavigation="Contained"
+                                        KeyboardNavigation.TabIndex="2">
+                                    <ContentPresenter x:Name="PART_SelectedContentHost"
+                                                      ContentSource="SelectedContent" />
+                                </Border>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
         </ResourceDictionary>
     </Window.Resources>
 
     <Grid Margin="24">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Text="Settings" Style="{StaticResource DefaultLabelStyle}" FontSize="20" FontWeight="Bold" Margin="0,0,0,20" />
+        <TextBlock Grid.Row="0"
+                   Text="Settings"
+                   Style="{StaticResource DefaultLabelStyle}"
+                   FontSize="20"
+                   FontWeight="Bold"
+                   Margin="0,0,0,20" />
 
-        <TextBlock Grid.Row="1" Text="Default template folder" Style="{StaticResource DefaultLabelStyle}" />
-        <Grid Grid.Row="2" Margin="0,5,0,18" Height="30">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <TextBox Text="{Binding TemplateFolderPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                     IsReadOnly="True"
-                     ToolTip="{Binding TemplateFolderPath}" />
-            <Button Grid.Column="1" Content="Select folder..." Click="SelectTemplateFolder_Click" Margin="10,0,0,0" />
-        </Grid>
+        <TabControl Grid.Row="1" Margin="0,0,0,18" Style="{StaticResource SettingsTabControlStyle}">
+            <TabItem Header="Folders">
+                <Grid Margin="18">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
 
-        <Grid Grid.Row="3" Margin="0,2,0,8">
-            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-            <TextBlock Text="Map packages" Style="{StaticResource DefaultLabelStyle}" FontWeight="Bold" />
-            <Button Grid.Column="1" Content="+ New package" Click="AddPackage_Click" Margin="10,0,0,0" />
-            <Button Grid.Column="2" Content="Delete selected" Click="DeletePackage_Click" Margin="10,0,0,0" />
-        </Grid>
+                    <TextBlock Grid.Row="0"
+                               Text="Anno Game Path"
+                               Style="{StaticResource DefaultLabelStyle}" />
+                    <Grid Grid.Row="1" Margin="0,5,0,18" Height="30">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBox Text="{Binding GamePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 IsReadOnly="True"
+                                 ToolTip="{Binding GamePath}" />
+                        <Button Grid.Column="1"
+                                Content="Select folder..."
+                                Click="SelectGamePath_Click"
+                                Margin="10,0,0,0" />
+                    </Grid>
 
-        <DataGrid Grid.Row="4" Name="PackagesGrid" ItemsSource="{Binding MapPackages}" AutoGenerateColumns="False"
-                  CanUserAddRows="False" SelectionMode="Single" SelectionUnit="FullRow" Margin="0,0,0,10"
-                  Background="{StaticResource MediumBackgroundBrush}"
-                  Foreground="{StaticResource ForegroundBrush}"
-                  BorderBrush="{StaticResource BrightBorderBrush}"
-                  GridLinesVisibility="Horizontal"
-                  HorizontalGridLinesBrush="{StaticResource BrightBorderBrush}"
-                  VerticalGridLinesBrush="{StaticResource BrightBorderBrush}">
-            <DataGrid.Resources>
-                <Style TargetType="{x:Type DataGridColumnHeader}">
-                    <Setter Property="Background" Value="{StaticResource BackgroundBrush}" />
-                    <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
-                    <Setter Property="BorderBrush" Value="{StaticResource BrightBorderBrush}" />
-                    <Setter Property="Padding" Value="8,6" />
-                </Style>
-                <Style TargetType="{x:Type DataGridCell}">
-                    <Setter Property="Background" Value="{StaticResource MediumBackgroundBrush}" />
-                    <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
-                    <Setter Property="BorderBrush" Value="{StaticResource BrightBorderBrush}" />
-                    <Setter Property="Padding" Value="5,3" />
-                    <Style.Triggers>
-                        <Trigger Property="IsSelected" Value="True">
-                            <Setter Property="Background" Value="{StaticResource SelectedBackgroundBrush}" />
-                            <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-                <Style TargetType="{x:Type DataGridRow}">
-                    <Setter Property="Background" Value="{StaticResource MediumBackgroundBrush}" />
-                    <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
-                    <Style.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="{StaticResource MouseoverBackgroundBrush}" />
-                        </Trigger>
-                        <Trigger Property="IsSelected" Value="True">
-                            <Setter Property="Background" Value="{StaticResource SelectedBackgroundBrush}" />
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-                <Style TargetType="{x:Type DataGridRowHeader}">
-                    <Setter Property="Background" Value="{StaticResource MediumBackgroundBrush}" />
-                    <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
-                    <Setter Property="BorderBrush" Value="{StaticResource BrightBorderBrush}" />
-                </Style>
-            </DataGrid.Resources>
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Package name" Binding="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Width="160" />
-                <DataGridTextColumn Header="Custom Map Folder" Binding="{Binding CustomMapFolder, UpdateSourceTrigger=PropertyChanged}" Width="*" />
-                <DataGridTextColumn Header="Custom Files Folder" Binding="{Binding CustomFilesFolder, UpdateSourceTrigger=PropertyChanged}" Width="*" />
-            </DataGrid.Columns>
-        </DataGrid>
+                    <TextBlock Grid.Row="2"
+                               Text="Default template folder"
+                               Style="{StaticResource DefaultLabelStyle}" />
+                    <Grid Grid.Row="3" Margin="0,5,0,0" Height="30">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBox Text="{Binding TemplateFolderPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 IsReadOnly="True"
+                                 ToolTip="{Binding TemplateFolderPath}" />
+                        <Button Grid.Column="1"
+                                Content="Select folder..."
+                                Click="SelectTemplateFolder_Click"
+                                Margin="10,0,0,0" />
+                    </Grid>
+                </Grid>
+            </TabItem>
 
-        <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="Select map folder..." Click="SelectCustomMapFolder_Click" Margin="0,0,10,0" />
-            <Button Content="Select files folder..." Click="SelectCustomFilesFolder_Click" Margin="0,0,10,0" />
-            <Button Content="Close" MinWidth="90" Click="Close_Click" />
+            <TabItem Header="Map packages">
+                <Grid Margin="18">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0" Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Map packages"
+                                   Style="{StaticResource DefaultLabelStyle}"
+                                   VerticalAlignment="Center" />
+                        <Button Grid.Column="1"
+                                Content="+ New package"
+                                Click="AddPackage_Click"
+                                Margin="0,0,10,0" />
+                        <Button Grid.Column="2"
+                                Content="Delete selected"
+                                Click="DeletePackage_Click" />
+                    </Grid>
+
+                    <DataGrid x:Name="PackagesGrid"
+                              Grid.Row="1"
+                              ItemsSource="{Binding MapPackages}"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False"
+                              SelectionMode="Single"
+                              SelectionUnit="FullRow"
+                              HeadersVisibility="Column"
+                              GridLinesVisibility="Horizontal"
+                              Margin="0,0,0,12">
+                        <DataGrid.Resources>
+                            <Style TargetType="{x:Type DataGrid}">
+                                <Setter Property="Background" Value="{StaticResource DarkBackgroundBrush}" />
+                                <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
+                                <Setter Property="BorderBrush" Value="{StaticResource BrightBorderBrush}" />
+                                <Setter Property="RowBackground" Value="{StaticResource MediumBackgroundBrush}" />
+                                <Setter Property="AlternatingRowBackground" Value="{StaticResource DarkBackgroundBrush}" />
+                            </Style>
+                            <Style TargetType="{x:Type DataGridColumnHeader}">
+                                <Setter Property="Background" Value="{StaticResource MediumBackgroundBrush}" />
+                                <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
+                                <Setter Property="BorderBrush" Value="{StaticResource BrightBorderBrush}" />
+                                <Setter Property="Padding" Value="6" />
+                            </Style>
+                            <Style TargetType="{x:Type DataGridCell}">
+                                <Setter Property="Background" Value="Transparent" />
+                                <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
+                                <Setter Property="BorderThickness" Value="0" />
+                                <Setter Property="Padding" Value="5" />
+                            </Style>
+                            <Style TargetType="{x:Type DataGridRow}">
+                                <Setter Property="Background" Value="{StaticResource MediumBackgroundBrush}" />
+                                <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="{StaticResource MouseoverBackgroundBrush}" />
+                                    </Trigger>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="Background" Value="{StaticResource SelectedBackgroundBrush}" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                            <Style TargetType="{x:Type DataGridRowHeader}">
+                                <Setter Property="Background" Value="{StaticResource MediumBackgroundBrush}" />
+                                <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
+                                <Setter Property="BorderBrush" Value="{StaticResource BrightBorderBrush}" />
+                            </Style>
+                        </DataGrid.Resources>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Package name"
+                                                Binding="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
+                                                Width="160" />
+                            <DataGridTextColumn Header="Custom Map Folder"
+                                                Binding="{Binding CustomMapFolder, UpdateSourceTrigger=PropertyChanged}"
+                                                Width="*" />
+                            <DataGridTextColumn Header="Custom Files Folder"
+                                                Binding="{Binding CustomFilesFolder, UpdateSourceTrigger=PropertyChanged}"
+                                                Width="*" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <StackPanel Grid.Row="2"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Right">
+                        <Button Content="Select map folder..."
+                                Click="SelectCustomMapFolder_Click"
+                                Margin="0,0,10,0" />
+                        <Button Content="Select files folder..."
+                                Click="SelectCustomFilesFolder_Click" />
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+            <TabItem Header="GUID Management">
+                <Grid Margin="18">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="180"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="Configure the GUIDs used for each world. Only numbers can be entered." TextWrapping="Wrap" Style="{StaticResource DefaultLabelStyle}" Margin="0,0,0,20"/>
+                    <TextBlock Grid.Row="1" Text="The Old World:" Style="{StaticResource DefaultLabelStyle}" VerticalAlignment="Center" Margin="0,0,12,10"/>
+                    <TextBox Grid.Row="1" Grid.Column="1" x:Name="OldWorldGuidTextBox" PreviewTextInput="GuidTextBox_PreviewTextInput" DataObject.Pasting="GuidTextBox_Pasting" Margin="0,0,0,10"/>
+                    <TextBlock Grid.Row="2" Text="The New World:" Style="{StaticResource DefaultLabelStyle}" VerticalAlignment="Center" Margin="0,0,12,10"/>
+                    <TextBox Grid.Row="2" Grid.Column="1" x:Name="NewWorldGuidTextBox" PreviewTextInput="GuidTextBox_PreviewTextInput" DataObject.Pasting="GuidTextBox_Pasting" Margin="0,0,0,10"/>
+                    <TextBlock Grid.Row="3" Text="Sunken Treasures:" Style="{StaticResource DefaultLabelStyle}" VerticalAlignment="Center" Margin="0,0,12,10"/>
+                    <TextBox Grid.Row="3" Grid.Column="1" x:Name="SunkenTreasuresGuidTextBox" PreviewTextInput="GuidTextBox_PreviewTextInput" DataObject.Pasting="GuidTextBox_Pasting" Margin="0,0,0,10"/>
+                    <TextBlock Grid.Row="4" Text="Arctic:" Style="{StaticResource DefaultLabelStyle}" VerticalAlignment="Center" Margin="0,0,12,10"/>
+                    <TextBox Grid.Row="4" Grid.Column="1" x:Name="ArcticGuidTextBox" PreviewTextInput="GuidTextBox_PreviewTextInput" DataObject.Pasting="GuidTextBox_Pasting" Margin="0,0,0,10"/>
+                    <TextBlock Grid.Row="5" Text="Enbesa:" Style="{StaticResource DefaultLabelStyle}" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                    <TextBox Grid.Row="5" Grid.Column="1" x:Name="EnbesaGuidTextBox" PreviewTextInput="GuidTextBox_PreviewTextInput" DataObject.Pasting="GuidTextBox_Pasting"/>
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+        <StackPanel Grid.Row="2"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right">
+            <Button Content="Close"
+                    MinWidth="90"
+                    Click="Close_Click" />
         </StackPanel>
     </Grid>
 </Window>
