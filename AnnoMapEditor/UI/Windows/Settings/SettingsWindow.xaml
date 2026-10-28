@@ -253,15 +253,15 @@
                     <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
                     <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="Configure the GUIDs used for each world. Only numbers can be entered." TextWrapping="Wrap" Style="{StaticResource DefaultLabelStyle}" Margin="0,0,0,20"/>
                     <TextBlock Grid.Row="1" Text="The Old World:" Style="{StaticResource DefaultLabelStyle}" VerticalAlignment="Center" Margin="0,0,12,10"/>
-                    <TextBox Grid.Row="1" Grid.Column="1" x:Name="OldWorldGuidTextBox" PreviewTextInput="GuidTextBox_PreviewTextInput" DataObject.Pasting="GuidTextBox_Pasting" Margin="0,0,0,10"/>
+                    <TextBox Grid.Row="1" Grid.Column="1" x:Name="OldWorldGuidTextBox" TextChanged="GuidTextBox_TextChanged" Text="{Binding OldWorldGuid, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="GuidTextBox_PreviewTextInput" DataObject.Pasting="GuidTextBox_Pasting" Margin="0,0,0,10"/>
                     <TextBlock Grid.Row="2" Text="The New World:" Style="{StaticResource DefaultLabelStyle}" VerticalAlignment="Center" Margin="0,0,12,10"/>
-                    <TextBox Grid.Row="2" Grid.Column="1" x:Name="NewWorldGuidTextBox" PreviewTextInput="GuidTextBox_PreviewTextInput" DataObject.Pasting="GuidTextBox_Pasting" Margin="0,0,0,10"/>
+                    <TextBox Grid.Row="2" Grid.Column="1" x:Name="NewWorldGuidTextBox" TextChanged="GuidTextBox_TextChanged" Text="{Binding NewWorldGuid, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="GuidTextBox_PreviewTextInput" DataObject.Pasting="GuidTextBox_Pasting" Margin="0,0,0,10"/>
                     <TextBlock Grid.Row="3" Text="Sunken Treasures:" Style="{StaticResource DefaultLabelStyle}" VerticalAlignment="Center" Margin="0,0,12,10"/>
-                    <TextBox Grid.Row="3" Grid.Column="1" x:Name="SunkenTreasuresGuidTextBox" PreviewTextInput="GuidTextBox_PreviewTextInput" DataObject.Pasting="GuidTextBox_Pasting" Margin="0,0,0,10"/>
+                    <TextBox Grid.Row="3" Grid.Column="1" x:Name="SunkenTreasuresGuidTextBox" TextChanged="GuidTextBox_TextChanged" Text="{Binding SunkenTreasuresGuid, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="GuidTextBox_PreviewTextInput" DataObject.Pasting="GuidTextBox_Pasting" Margin="0,0,0,10"/>
                     <TextBlock Grid.Row="4" Text="Arctic:" Style="{StaticResource DefaultLabelStyle}" VerticalAlignment="Center" Margin="0,0,12,10"/>
-                    <TextBox Grid.Row="4" Grid.Column="1" x:Name="ArcticGuidTextBox" PreviewTextInput="GuidTextBox_PreviewTextInput" DataObject.Pasting="GuidTextBox_Pasting" Margin="0,0,0,10"/>
+                    <TextBox Grid.Row="4" Grid.Column="1" x:Name="ArcticGuidTextBox" TextChanged="GuidTextBox_TextChanged" Text="{Binding ArcticGuid, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="GuidTextBox_PreviewTextInput" DataObject.Pasting="GuidTextBox_Pasting" Margin="0,0,0,10"/>
                     <TextBlock Grid.Row="5" Text="Enbesa:" Style="{StaticResource DefaultLabelStyle}" VerticalAlignment="Center" Margin="0,0,12,0"/>
-                    <TextBox Grid.Row="5" Grid.Column="1" x:Name="EnbesaGuidTextBox" PreviewTextInput="GuidTextBox_PreviewTextInput" DataObject.Pasting="GuidTextBox_Pasting"/>
+                    <TextBox Grid.Row="5" Grid.Column="1" x:Name="EnbesaGuidTextBox" TextChanged="GuidTextBox_TextChanged" Text="{Binding EnbesaGuid, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="GuidTextBox_PreviewTextInput" DataObject.Pasting="GuidTextBox_Pasting"/>
                 </Grid>
             </TabItem>
         </TabControl>
