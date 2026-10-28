@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -40,10 +40,15 @@ namespace AnnoMapEditor.UI.Controls.IslandProperties
                 case FixedIslandElement fixedIsland:
                     fixedIsland.Fertilities.CollectionChanged += Fertilities_CollectionChanged;
                     SlotsViewModel = new SlotsViewModel(fixedIsland, MapTemplate.Session.Region);
-                    if (fixedIsland.IslandAsset.IslandSize.Contains(IslandSize.Continental))
+                    if (!string.IsNullOrWhiteSpace(fixedIsland.IslandAsset.CustomSourceDirectory)
+                        || fixedIsland.IslandAsset.IslandSize.Contains(IslandSize.Continental))
+                    {
                         IslandTypeItems.AddRange(AllowedTypesPerElementType[MapElementType.FixedIsland]);
+                    }
                     else
+                    {
                         IslandTypeItems.AddRange(fixedIsland.IslandAsset.IslandType);
+                    }
                     UpdateSelectedFertilities();
                     break;
                 case RandomIslandElement randomIsland:

@@ -1,4 +1,4 @@
-﻿using Anno.FileDBModels.Anno1800.Gamedata.Models.Shared;
+using Anno.FileDBModels.Anno1800.Gamedata.Models.Shared;
 using AnnoMapEditor.DataArchives;
 using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.DataArchives.Assets.Repositories;
@@ -20,6 +20,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
+using System.Xml.Linq;
 
 namespace AnnoMapEditor.Mods.Serialization
 {
@@ -160,9 +161,9 @@ namespace AnnoMapEditor.Mods.Serialization
                 }
             }
 
-            await WriteAssetsXml(modPath, mapTemplatesToReplace);
             CopyCustomIslandDirectories(mod.MapTemplate, modPath);
             CopyAdditionalFiles(mod.MapTemplate, modPath);
+            await WriteAssetsXml(mod, modPath, mapTemplatesToReplace);
 
             return true;
         }
@@ -239,7 +240,7 @@ namespace AnnoMapEditor.Mods.Serialization
 
 
 
-        private static async Task WriteAssetsXml(string modPath, IEnumerable<MapTemplateAsset> mapTemplatesToReplace)
+        private async Task WriteAssetsXml(Mod mod, string modPath, IEnumerable<MapTemplateAsset> mapTemplatesToReplace)
         {
             string assetsXmlPath = Path.Combine(modPath, @"data\config\export\main\asset\assets.xml");
 
@@ -247,8 +248,27 @@ namespace AnnoMapEditor.Mods.Serialization
             if (assetsXmlDir is not null)
                 Directory.CreateDirectory(assetsXmlDir);
 
-            StringBuilder sb = new();
-            sb.Append("<ModOps>\n");
+            XElement modOps = new("ModOps");
+            HashSet<long> usedGuids = new();
+
+            // A package may already provide an assets.xml through Custom Files. Preserve all of
+            // its ModOps and include its asset GUIDs when searching for a free regional GUID.
+            if (File.Exists(assetsXmlPath))
+            {
+                XDocument existingDocument = XDocument.Load(assetsXmlPath);
+                XElement? existingRoot = existingDocument.Root;
+                if (existingRoot?.Name.LocalName != "ModOps")
+                    throw new InvalidDataException($"Existing assets.xml '{assetsXmlPath}' does not have a ModOps root element.");
+
+                foreach (XElement existingModOp in existingRoot.Elements())
+                    modOps.Add(new XElement(existingModOp));
+
+                foreach (XElement guidElement in existingRoot.Descendants("Standard").Elements("GUID"))
+                {
+                    if (long.TryParse(guidElement.Value, out long usedGuid))
+                        usedGuids.Add(usedGuid);
+                }
+            }
 
             foreach (MapTemplateAsset mapTemplateAsset in mapTemplatesToReplace)
             {
@@ -257,14 +277,127 @@ namespace AnnoMapEditor.Mods.Serialization
                     ? GetEnlargedTemplatePath(templateFilename)
                     : null;
 
-                WriteModOpReplaceTemplateFilename(sb, mapTemplateAsset.GUID, templateFilename, enlargedTemplateFilename);
+                StringBuilder replacement = new();
+                WriteModOpReplaceTemplateFilename(replacement, mapTemplateAsset.GUID, templateFilename, enlargedTemplateFilename);
+                XElement replacementElement = XElement.Parse(replacement.ToString());
+                modOps.Add(replacementElement);
             }
 
-            sb.Append("</ModOps>\n");
+            IReadOnlyList<IslandAsset> customIslands = GetCustomIslands(mod.MapTemplate);
+            if (customIslands.Count > 0)
+            {
+                long rangeStart = GetCustomIslandGuidRangeStart(mod.MapTemplate.Session);
+                string islandRegion = GetIslandRegionId(mod.MapTemplate.Session);
+                Queue<long> freeGuids = GetFreeCustomIslandGuids(rangeStart, usedGuids);
 
-            using StreamWriter writer = new(File.Create(assetsXmlPath));
-            await writer.WriteAsync(sb.ToString());
+                if (freeGuids.Count < customIslands.Count)
+                {
+                    throw new InvalidOperationException(
+                        $"The GUID range {rangeStart}-{rangeStart + 24} for '{mod.MapTemplate.Session.DisplayName}' " +
+                        $"does not contain enough free GUIDs. Required: {customIslands.Count}; available: {freeGuids.Count}.");
+                }
+
+                foreach (IslandAsset island in customIslands)
+                {
+                    long guid = freeGuids.Dequeue();
+                    string mapName = Path.GetFileNameWithoutExtension(island.FilePath);
+                    string exportedFilePath = island.FilePath.Replace('\\', '/');
+                    modOps.Add(CreateCustomIslandModOp(guid, mapName, exportedFilePath, islandRegion));
+                }
+            }
+
+            XDocument document = new(new XDeclaration("1.0", "utf-8", null), modOps);
+            await using FileStream stream = new(
+                assetsXmlPath,
+                FileMode.Create,
+                FileAccess.Write,
+                FileShare.None,
+                bufferSize: 4096,
+                useAsync: true);
+            await document.SaveAsync(stream, SaveOptions.None, default);
         }
+
+        private static IReadOnlyList<IslandAsset> GetCustomIslands(MapTemplate mapTemplate)
+        {
+            return mapTemplate.Elements
+                .OfType<FixedIslandElement>()
+                .Select(element => element.IslandAsset)
+                .Where(asset => !string.IsNullOrWhiteSpace(asset.CustomSourceDirectory))
+                .GroupBy(asset => asset.FilePath, StringComparer.OrdinalIgnoreCase)
+                .Select(group => group.First())
+                .OrderBy(asset => asset.FilePath, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+        }
+
+        private static long GetCustomIslandGuidRangeStart(SessionAsset session)
+        {
+            if (!long.TryParse(Settings.Instance.CustomIslandGuid, out long baseGuid) || baseGuid <= 0)
+            {
+                throw new InvalidOperationException(
+                    "A valid positive numeric GUID must be configured in Settings > GUID Management before exporting a map with custom islands.");
+            }
+
+            int regionOffset = session.GUID switch
+            {
+                SessionAsset.SESSION_OLDWORLD_GUID => 0,
+                SessionAsset.SESSION_NEWWORLD_GUID => 25,
+                SessionAsset.SESSION_SUNKENTREASURES_GUID => 50,
+                SessionAsset.SESSION_ARCTIC_GUID => 75,
+                SessionAsset.SESSION_ENBESA_GUID => 100,
+                _ => throw new InvalidOperationException(
+                    $"Custom-island GUID allocation is not supported for session GUID {session.GUID}.")
+            };
+
+            if (baseGuid > long.MaxValue - regionOffset - 24)
+                throw new InvalidOperationException("The configured custom-island GUID is too large.");
+
+            return baseGuid + regionOffset;
+        }
+
+        private Queue<long> GetFreeCustomIslandGuids(long rangeStart, ISet<long> additionallyUsedGuids)
+        {
+            Queue<long> freeGuids = new();
+            for (long guid = rangeStart; guid <= rangeStart + 24; guid++)
+            {
+                bool existsInGameData = _assetRepository.TryGet(guid, out StandardAsset? _);
+                if (!existsInGameData && !additionallyUsedGuids.Contains(guid))
+                    freeGuids.Enqueue(guid);
+            }
+            return freeGuids;
+        }
+
+        private static string GetIslandRegionId(SessionAsset session)
+        {
+            return session.GUID switch
+            {
+                SessionAsset.SESSION_OLDWORLD_GUID => "Moderate",
+                SessionAsset.SESSION_NEWWORLD_GUID => "Colony01",
+                SessionAsset.SESSION_SUNKENTREASURES_GUID => "Moderate",
+                SessionAsset.SESSION_ARCTIC_GUID => "Arctic",
+                SessionAsset.SESSION_ENBESA_GUID => "Africa",
+                _ => throw new InvalidOperationException(
+                    $"Cannot determine IslandRegion for session GUID {session.GUID}.")
+            };
+        }
+
+        private static XElement CreateCustomIslandModOp(long guid, string mapName, string filePath, string islandRegion)
+        {
+            return new XElement("ModOp",
+                new XAttribute("GUID", "116676"),
+                new XAttribute("Type", "addNextSibling"),
+                new XElement("Asset",
+                    new XElement("Template", "RandomIsland"),
+                    new XElement("Values",
+                        new XElement("Standard",
+                            new XElement("GUID", guid),
+                            new XElement("Name", mapName)),
+                        new XElement("RandomIsland",
+                            new XElement("FilePath", filePath),
+                            new XElement("IslandRegion", islandRegion),
+                            new XElement("IslandDifficulty", "Normal;Hard"),
+                            new XElement("IslandType", "Normal;Starter")))));
+        }
+
 
         private static async Task WriteModinfoJson(Mod mod, string modPath)
         {

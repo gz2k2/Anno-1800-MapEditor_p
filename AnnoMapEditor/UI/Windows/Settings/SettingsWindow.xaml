@@ -110,6 +110,7 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
@@ -249,19 +250,37 @@
             </TabItem>
             <TabItem Header="GUID Management">
                 <Grid Margin="18">
-                    <Grid.ColumnDefinitions><ColumnDefinition Width="180"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
-                    <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="Configure the GUIDs used for each world. Only numbers can be entered." TextWrapping="Wrap" Style="{StaticResource DefaultLabelStyle}" Margin="0,0,0,20"/>
-                    <TextBlock Grid.Row="1" Text="The Old World:" Style="{StaticResource DefaultLabelStyle}" VerticalAlignment="Center" Margin="0,0,12,10"/>
-                    <TextBox Grid.Row="1" Grid.Column="1" x:Name="OldWorldGuidTextBox" TextChanged="GuidTextBox_TextChanged" Text="{Binding OldWorldGuid, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="GuidTextBox_PreviewTextInput" DataObject.Pasting="GuidTextBox_Pasting" Margin="0,0,0,10"/>
-                    <TextBlock Grid.Row="2" Text="The New World:" Style="{StaticResource DefaultLabelStyle}" VerticalAlignment="Center" Margin="0,0,12,10"/>
-                    <TextBox Grid.Row="2" Grid.Column="1" x:Name="NewWorldGuidTextBox" TextChanged="GuidTextBox_TextChanged" Text="{Binding NewWorldGuid, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="GuidTextBox_PreviewTextInput" DataObject.Pasting="GuidTextBox_Pasting" Margin="0,0,0,10"/>
-                    <TextBlock Grid.Row="3" Text="Sunken Treasures:" Style="{StaticResource DefaultLabelStyle}" VerticalAlignment="Center" Margin="0,0,12,10"/>
-                    <TextBox Grid.Row="3" Grid.Column="1" x:Name="SunkenTreasuresGuidTextBox" TextChanged="GuidTextBox_TextChanged" Text="{Binding SunkenTreasuresGuid, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="GuidTextBox_PreviewTextInput" DataObject.Pasting="GuidTextBox_Pasting" Margin="0,0,0,10"/>
-                    <TextBlock Grid.Row="4" Text="Arctic:" Style="{StaticResource DefaultLabelStyle}" VerticalAlignment="Center" Margin="0,0,12,10"/>
-                    <TextBox Grid.Row="4" Grid.Column="1" x:Name="ArcticGuidTextBox" TextChanged="GuidTextBox_TextChanged" Text="{Binding ArcticGuid, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="GuidTextBox_PreviewTextInput" DataObject.Pasting="GuidTextBox_Pasting" Margin="0,0,0,10"/>
-                    <TextBlock Grid.Row="5" Text="Enbesa:" Style="{StaticResource DefaultLabelStyle}" VerticalAlignment="Center" Margin="0,0,12,0"/>
-                    <TextBox Grid.Row="5" Grid.Column="1" x:Name="EnbesaGuidTextBox" TextChanged="GuidTextBox_TextChanged" Text="{Binding EnbesaGuid, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="GuidTextBox_PreviewTextInput" DataObject.Pasting="GuidTextBox_Pasting"/>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0"
+                               Text="GUID"
+                               Style="{StaticResource DefaultLabelStyle}" />
+                    <TextBox x:Name="CustomIslandGuidTextBox"
+                             Grid.Row="1"
+                             Width="320"
+                             HorizontalAlignment="Left"
+                             Margin="0,5,0,10"
+                             Text="{Binding CustomIslandGuid, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             PreviewTextInput="GuidTextBox_PreviewTextInput"
+                             DataObject.Pasting="GuidTextBox_Pasting" />
+                    <TextBlock Grid.Row="2"
+                               MaxWidth="700"
+                               HorizontalAlignment="Left"
+                               TextWrapping="Wrap"
+                               Style="{StaticResource DefaultLabelStyle}"
+                               Text="For custom islands, up to 25 GUIDs are reserved per map. These GUIDs are used to integrate the custom maps into the game so that fertilities and slots can be assigned." />
+                    <TextBlock Grid.Row="3"
+                               MaxWidth="700"
+                               HorizontalAlignment="Left"
+                               Margin="0,14,0,0"
+                               TextWrapping="Wrap"
+                               Foreground="#FFFF5555"
+                               FontWeight="Bold"
+                               Text="WARNING! It is essential and mandatory to use your own unused GUIDs. Using incorrect or duplicate GUIDs can and will cause errors in the game." />
                 </Grid>
             </TabItem>
         </TabControl>

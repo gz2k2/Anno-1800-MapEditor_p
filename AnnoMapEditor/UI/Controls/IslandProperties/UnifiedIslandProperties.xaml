@@ -167,7 +167,7 @@
                                        Text="The game may not generate fertilities for an island from another region." />
                             <ToggleButton Style="{StaticResource FancyToggleButton}" Margin="0,6,0,0"
                                           IsChecked="{Binding AppRandomizeFertilities}">
-                                <TextBlock Margin="5,0" Text="App randomizes fertilities" />
+                                <TextBlock Margin="5,0" Text="App randomizes fertilities" Foreground="Black" />
                             </ToggleButton>
                             <Grid Margin="0,6,0,0" Visibility="{Binding AppRandomizeFertilities, Converter={StaticResource VisibleOnTrue}}">
                                 <Grid.ColumnDefinitions>

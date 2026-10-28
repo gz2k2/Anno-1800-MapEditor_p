@@ -3,6 +3,8 @@ using AnnoMapEditor.UI.Overlays.SelectIsland;
 using AnnoMapEditor.UI.Overlays.SelectCustomIsland;
 using AnnoMapEditor.UI.Overlays.SelectSlots;
 using System;
+using System.Windows;
+using System.Windows.Threading;
 using System.Windows.Controls;
 
 namespace AnnoMapEditor.UI.Overlays
@@ -52,8 +54,14 @@ namespace AnnoMapEditor.UI.Overlays
 
             if (closedControl != null)
             {
-                closedControl.DataContext = null;
-                ContentHost.Children.Remove(closedControl);
+                closedControl.IsHitTestVisible = false;
+                closedControl.Visibility = Visibility.Collapsed;
+
+                Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() =>
+                {
+                    closedControl.DataContext = null;
+                    ContentHost.Children.Remove(closedControl);
+                }));
             }
         }
     }

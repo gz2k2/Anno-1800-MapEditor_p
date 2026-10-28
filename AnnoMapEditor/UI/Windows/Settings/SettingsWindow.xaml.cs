@@ -10,13 +10,10 @@ namespace AnnoMapEditor.UI.Windows.Configuration
 {
     public partial class SettingsWindow : Window
     {
-        private bool _settingsInitialized;
-
         public SettingsWindow()
         {
             InitializeComponent();
             DataContext = Settings.Instance;
-            _settingsInitialized = true;
             ICollectionView packagesView = CollectionViewSource.GetDefaultView(Settings.Instance.MapPackages);
             packagesView.SortDescriptions.Add(new SortDescription(nameof(MapPackage.Name), ListSortDirection.Ascending));
             if (packagesView is ICollectionViewLiveShaping liveShaping && liveShaping.CanChangeLiveSorting)
@@ -92,21 +89,6 @@ namespace AnnoMapEditor.UI.Windows.Configuration
                 package.CustomFilesFolder = picker.SelectedPath;
         }
 
-        private void GuidTextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
-        {
-            if (!_settingsInitialized || sender is not System.Windows.Controls.TextBox textBox)
-                return;
-
-            switch (textBox.Name)
-            {
-                case nameof(OldWorldGuidTextBox): Settings.Instance.OldWorldGuid = textBox.Text; break;
-                case nameof(NewWorldGuidTextBox): Settings.Instance.NewWorldGuid = textBox.Text; break;
-                case nameof(SunkenTreasuresGuidTextBox): Settings.Instance.SunkenTreasuresGuid = textBox.Text; break;
-                case nameof(ArcticGuidTextBox): Settings.Instance.ArcticGuid = textBox.Text; break;
-                case nameof(EnbesaGuidTextBox): Settings.Instance.EnbesaGuid = textBox.Text; break;
-            }
-        }
-
         private static bool IsDigitsOnly(string value) => Regex.IsMatch(value, @"^[0-9]*$");
 
         private void GuidTextBox_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
@@ -129,11 +111,7 @@ namespace AnnoMapEditor.UI.Windows.Configuration
 
         private async void Close_Click(object sender, RoutedEventArgs e)
         {
-            Settings.Instance.OldWorldGuid = OldWorldGuidTextBox.Text;
-            Settings.Instance.NewWorldGuid = NewWorldGuidTextBox.Text;
-            Settings.Instance.SunkenTreasuresGuid = SunkenTreasuresGuidTextBox.Text;
-            Settings.Instance.ArcticGuid = ArcticGuidTextBox.Text;
-            Settings.Instance.EnbesaGuid = EnbesaGuidTextBox.Text;
+            Settings.Instance.CustomIslandGuid = CustomIslandGuidTextBox.Text;
 
             PackagesGrid.CommitEdit();
             Settings.Instance.SaveMapPackages();

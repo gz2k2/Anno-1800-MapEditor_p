@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="AnnoMapEditor.UI.Controls.Slots.SlotsControl"
+<UserControl x:Class="AnnoMapEditor.UI.Controls.Slots.SlotsControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -54,7 +54,7 @@
                            Text="The game may not generate local resources for slots on an island from another region." />
                 <ToggleButton Style="{StaticResource FancyToggleButton}" Margin="0,6,0,0"
                               IsChecked="{Binding AppRandomizeSlots}">
-                    <TextBlock Margin="5,0" Text="App randomizes slots" />
+                    <TextBlock Margin="5,0" Text="App randomizes slots" Foreground="Black" />
                 </ToggleButton>
                 <Grid Margin="0,6,0,0" Visibility="{Binding AppRandomizeSlots, Converter={StaticResource VisibleOnTrue}}">
                     <Grid.ColumnDefinitions>

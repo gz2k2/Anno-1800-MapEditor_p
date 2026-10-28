@@ -1,4 +1,4 @@
-﻿using AnnoMapEditor.DataArchives.Assets.Models;
+using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.Mods.Enums;
 using AnnoMapEditor.Mods.Models;
@@ -137,9 +137,13 @@ namespace AnnoMapEditor.UI.Overlays.ExportAsMod
                 MessageBox.Show("Failed to save the mod.\n\nIt looks like some files are locked, possibly by another application.\n\nThe mod may be broken now.", App.TitleShort, MessageBoxButton.OK, MessageBoxImage.Exclamation);
                 return false;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                MessageBox.Show("Failed to save the mod.\n\nThe mod may be broken now.", App.TitleShort, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                MessageBox.Show(
+                    $"Failed to save the mod.\n\n{ex.Message}\n\nThe mod may be broken now.",
+                    App.TitleShort,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Exclamation);
                 return false;
             }
             finally
