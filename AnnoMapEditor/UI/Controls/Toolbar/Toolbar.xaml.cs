@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 using System.Windows.Controls;
 using AnnoMapEditor.Utilities.UndoRedo;
 using System.Diagnostics;
@@ -93,9 +93,7 @@ namespace AnnoMapEditor.UI.Controls.Toolbar
 
         private void CustomIslands_Click(object sender, RoutedEventArgs e)
         {
-            ToolbarService.Instance.ButtonContextClick(ToolbarButtonType.ShowCustomIslandsMenu, sender);
-            ToolbarCustomIslandsContextMenu.PlacementTarget = sender as UIElement;
-            ToolbarCustomIslandsContextMenu.IsOpen = true;
+            ToolbarService.Instance.ButtonClick(ToolbarButtonType.ShowCustomIslandsMenu);
         }
 
         private void Settings_Click(object sender, RoutedEventArgs e)

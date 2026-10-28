@@ -1,0 +1,110 @@
+<UserControl x:Class="AnnoMapEditor.UI.Overlays.SelectCustomIsland.SelectCustomIslandOverlay"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AnnoMapEditor.UI.Overlays.SelectCustomIsland"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=local:SelectCustomIslandViewModel}"
+        Background="{StaticResource TransparentBackgroundBrush}">
+    <Grid Margin="80">
+        <Border Background="{StaticResource DarkBackgroundBrush}"
+                BorderBrush="{StaticResource BrightBorderBrush}"
+                BorderThickness="1"
+                Padding="18">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0" Margin="0,0,0,14">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <TextBlock Text="Select Custom Island"
+                                   Style="{StaticResource DefaultLabelStyle}"
+                                   FontSize="20"
+                                   FontWeight="Bold" />
+                        <TextBlock Text="Select a map package and then choose a custom island."
+                                   Style="{StaticResource DefaultLabelStyle}"
+                                   Margin="0,5,0,0" />
+                    </StackPanel>
+                    <Button Grid.Column="1" Content="Cancel" Click="Cancel_Click" MinWidth="90" />
+                </Grid>
+
+                <ComboBox Grid.Row="1"
+                          Width="320"
+                          HorizontalAlignment="Left"
+                          Margin="0,0,0,14"
+                          ItemsSource="{Binding PackageNames}"
+                          SelectedItem="{Binding SelectedPackageName, Mode=TwoWay}" />
+
+                <ListBox Grid.Row="2"
+                         ItemsSource="{Binding Islands}"
+                         SelectedItem="{Binding SelectedIsland, Mode=TwoWay}"
+                         HorizontalContentAlignment="Stretch"
+                         VerticalContentAlignment="Stretch"
+                         Background="{StaticResource BackgroundBrush}"
+                         BorderBrush="{StaticResource BrightBorderBrush}"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="6" ToolTip="{Binding DisplayName}">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Border Background="{StaticResource MediumBackgroundBrush}"
+                                        BorderBrush="{StaticResource BrightBorderBrush}"
+                                        BorderThickness="1">
+                                    <Image Source="{Binding Thumbnail}" Stretch="Uniform" />
+                                </Border>
+                                <TextBlock Grid.Row="1"
+                                           Text="{Binding DisplayName}"
+                                           Style="{StaticResource DefaultLabelStyle}"
+                                           TextAlignment="Center"
+                                           TextWrapping="Wrap"
+                                           Margin="3,6,3,0" />
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Width" Value="190" />
+                            <Setter Property="Height" Value="220" />
+                            <Setter Property="Padding" Value="0" />
+                            <Setter Property="Margin" Value="4" />
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel IsItemsHost="True" />
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                </ListBox>
+
+                <TextBlock Grid.Row="2"
+                           Text="No custom islands were found for the selected package."
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           IsHitTestVisible="False">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock" BasedOn="{StaticResource DefaultLabelStyle}">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding HasIslands}" Value="False">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

@@ -1,4 +1,4 @@
-﻿using System.Collections.Specialized;
+using System.Collections.Specialized;
 using System.Collections.Generic;
 using AnnoMapEditor.DataArchives;
 using AnnoMapEditor.DataArchives.Assets.Models;
@@ -20,6 +20,7 @@ using System.Windows.Input;
 using AnnoMapEditor.UI.Controls.Toolbar;
 using AnnoMapEditor.UI.Overlays;
 using AnnoMapEditor.UI.Overlays.ExportAsMod;
+using AnnoMapEditor.UI.Overlays.SelectCustomIsland;
 using MapTemplate = AnnoMapEditor.MapTemplates.Models.MapTemplate;
 using System;
 using System.Linq;
@@ -197,8 +198,7 @@ namespace AnnoMapEditor.UI.Windows.Main
                         SaveMapFileDialog();
                         break;
                     case ToolbarButtonType.ShowCustomIslandsMenu:
-                        if (sender is Button { ContextMenu: not null } customIslandsButton)
-                            PopulateCustomIslandMenu(customIslandsButton.ContextMenu);
+                        ShowCustomIslandPopup();
                         break;
                     case ToolbarButtonType.SelectTemplateFolder:
                         SelectTemplateFolder();
@@ -291,6 +291,15 @@ namespace AnnoMapEditor.UI.Windows.Main
 
                 menu.Items.Add(groupMenu);
             }
+        }
+
+        private async void ShowCustomIslandPopup()
+        {
+            await CustomIslandCatalog.Instance.RefreshAsync();
+
+            SelectCustomIslandViewModel viewModel = new();
+            viewModel.IslandSelected += (_, e) => AddCustomIsland(e.IslandAsset);
+            OverlayService.Instance.Show(viewModel);
         }
 
         public void PopulateCustomIslandMenu(ContextMenu menu)

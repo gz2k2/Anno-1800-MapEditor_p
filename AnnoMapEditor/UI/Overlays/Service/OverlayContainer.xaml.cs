@@ -1,5 +1,6 @@
-﻿using AnnoMapEditor.UI.Overlays.ExportAsMod;
+using AnnoMapEditor.UI.Overlays.ExportAsMod;
 using AnnoMapEditor.UI.Overlays.SelectIsland;
+using AnnoMapEditor.UI.Overlays.SelectCustomIsland;
 using AnnoMapEditor.UI.Overlays.SelectSlots;
 using System;
 using System.Windows.Controls;
@@ -28,6 +29,7 @@ namespace AnnoMapEditor.UI.Overlays
             {
                 ExportAsModViewModel _ => new ExportAsModOverlay(),
                 SelectIslandViewModel _ => new SelectIslandOverlay(),
+                SelectCustomIslandViewModel _ => new SelectCustomIslandOverlay(),
                 SelectSlotsViewModel _ => new SelectSlotsOverlay(),
                 _ => throw new ArgumentException()
             };
