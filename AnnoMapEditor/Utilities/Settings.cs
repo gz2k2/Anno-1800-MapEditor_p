@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.IO;
+using System.Linq;
 
 namespace AnnoMapEditor.Utilities
 {
@@ -50,7 +51,7 @@ namespace AnnoMapEditor.Utilities
             foreach (MapPackage package in _configuration.MapPackages) MapPackages.Add(package);
             if (MapPackages.Count == 0 && !string.IsNullOrWhiteSpace(CustomIslandsPath))
                 MapPackages.Add(new MapPackage { Name = "Migrated package", CustomMapFolder = CustomIslandsPath });
-            EnsureTwoDigitPackageIds();
+            EnsureTwoCharacterPackageIds();
             MapPackages.CollectionChanged += MapPackages_CollectionChanged;
             foreach (MapPackage package in MapPackages) package.PropertyChanged += MapPackage_PropertyChanged;
             if (GamePath == null) _configuration.GamePath = GetInstallDirFromRegistry();
@@ -101,14 +102,17 @@ namespace AnnoMapEditor.Utilities
         {
             if (e.OldItems != null) foreach (MapPackage package in e.OldItems) package.PropertyChanged -= MapPackage_PropertyChanged;
             if (e.NewItems != null) foreach (MapPackage package in e.NewItems) package.PropertyChanged += MapPackage_PropertyChanged;
-            EnsureTwoDigitPackageIds();
+            EnsureTwoCharacterPackageIds();
             Save();
         }
 
-        private void EnsureTwoDigitPackageIds()
+        private const string PackageIdCharacters = "0123456789abcdefghijklmnopqrstuvwxyz";
+
+        private void EnsureTwoCharacterPackageIds()
         {
-            if (MapPackages.Count > 99)
-                throw new InvalidOperationException("A maximum of 99 map packages is supported.");
+            const int idCapacity = 36 * 36;
+            if (MapPackages.Count > idCapacity)
+                throw new InvalidOperationException($"A maximum of {idCapacity} map packages is supported.");
 
             HashSet<string> usedIds = new(StringComparer.Ordinal);
             Queue<MapPackage> packagesNeedingId = new();
@@ -117,24 +121,25 @@ namespace AnnoMapEditor.Utilities
             {
                 string id = package.Id?.Trim() ?? string.Empty;
                 bool isValid = id.Length == 2
-                    && int.TryParse(id, out int numericId)
-                    && numericId >= 1
-                    && numericId <= 99
+                    && id.All(character => PackageIdCharacters.Contains(character))
                     && usedIds.Add(id);
 
                 if (!isValid)
                     packagesNeedingId.Enqueue(package);
             }
 
-            for (int numericId = 1; numericId <= 99 && packagesNeedingId.Count > 0; numericId++)
+            for (int first = 0; first < PackageIdCharacters.Length && packagesNeedingId.Count > 0; first++)
             {
-                string candidate = numericId.ToString("D2");
-                if (usedIds.Add(candidate))
-                    packagesNeedingId.Dequeue().Id = candidate;
+                for (int second = 0; second < PackageIdCharacters.Length && packagesNeedingId.Count > 0; second++)
+                {
+                    string candidate = string.Concat(PackageIdCharacters[first], PackageIdCharacters[second]);
+                    if (usedIds.Add(candidate))
+                        packagesNeedingId.Dequeue().Id = candidate;
+                }
             }
 
             if (packagesNeedingId.Count > 0)
-                throw new InvalidOperationException("No free two-digit map package ID is available.");
+                throw new InvalidOperationException("No free two-character map package ID is available.");
         }
         private void MapPackage_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) => Save();
         public void SaveMapPackages() => Save();

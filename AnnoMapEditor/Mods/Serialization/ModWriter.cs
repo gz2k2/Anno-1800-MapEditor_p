@@ -286,7 +286,7 @@ namespace AnnoMapEditor.Mods.Serialization
             IReadOnlyList<IslandAsset> customIslands = GetCustomIslands(mod.MapTemplate);
             if (customIslands.Count > 0)
             {
-                long rangeStart = GetCustomIslandGuidRangeStart(mod.MapTemplate.Session);
+                long rangeStart = GetCustomIslandGuidRangeStart(mod.MapTemplate.Session, mod.MapType);
                 string islandRegion = GetIslandRegionId(mod.MapTemplate.Session);
                 Queue<long> freeGuids = GetFreeCustomIslandGuids(rangeStart, usedGuids);
 
@@ -329,7 +329,7 @@ namespace AnnoMapEditor.Mods.Serialization
                 .ToList();
         }
 
-        private static long GetCustomIslandGuidRangeStart(SessionAsset session)
+        private static long GetCustomIslandGuidRangeStart(SessionAsset session, MapType? mapType)
         {
             if (!long.TryParse(Settings.Instance.CustomIslandGuid, out long baseGuid) || baseGuid <= 0)
             {
@@ -337,21 +337,38 @@ namespace AnnoMapEditor.Mods.Serialization
                     "A valid positive numeric GUID must be configured in Settings > GUID Management before exporting a map with custom islands.");
             }
 
-            int regionOffset = session.GUID switch
+            int rangeIndex;
+            if (session.GUID == SessionAsset.SESSION_OLDWORLD_GUID)
             {
-                SessionAsset.SESSION_OLDWORLD_GUID => 0,
-                SessionAsset.SESSION_NEWWORLD_GUID => 25,
-                SessionAsset.SESSION_SUNKENTREASURES_GUID => 50,
-                SessionAsset.SESSION_ARCTIC_GUID => 75,
-                SessionAsset.SESSION_ENBESA_GUID => 100,
-                _ => throw new InvalidOperationException(
-                    $"Custom-island GUID allocation is not supported for session GUID {session.GUID}.")
-            };
+                rangeIndex = mapType switch
+                {
+                    MapType type when type == MapType.Archipelago => 0,
+                    MapType type when type == MapType.Atoll => 1,
+                    MapType type when type == MapType.Corners => 2,
+                    MapType type when type == MapType.IslandArc => 3,
+                    MapType type when type == MapType.Snowflake => 4,
+                    _ => throw new InvalidOperationException(
+                        "A supported Old World map variant is required for custom-island GUID allocation.")
+                };
+            }
+            else
+            {
+                rangeIndex = session.GUID switch
+                {
+                    SessionAsset.SESSION_NEWWORLD_GUID => 5,
+                    SessionAsset.SESSION_SUNKENTREASURES_GUID => 6,
+                    SessionAsset.SESSION_ARCTIC_GUID => 7,
+                    SessionAsset.SESSION_ENBESA_GUID => 8,
+                    _ => throw new InvalidOperationException(
+                        $"Custom-island GUID allocation is not supported for session GUID {session.GUID}.")
+                };
+            }
 
-            if (baseGuid > long.MaxValue - regionOffset - 24)
+            int rangeOffset = checked(rangeIndex * 25);
+            if (baseGuid > long.MaxValue - rangeOffset - 24)
                 throw new InvalidOperationException("The configured custom-island GUID is too large.");
 
-            return baseGuid + regionOffset;
+            return baseGuid + rangeOffset;
         }
 
         private Queue<long> GetFreeCustomIslandGuids(long rangeStart, ISet<long> additionallyUsedGuids)
