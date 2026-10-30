@@ -41,6 +41,7 @@ namespace AnnoMapEditor.Utilities
         public bool EnableExpertMode { get => _configuration.EnableExpertMode; set => Set(value, nameof(EnableExpertMode)); }
         public string? CustomIslandsPath { get => _configuration.CustomIslandsPath; set => Set(value, nameof(CustomIslandsPath)); }
         public string? TemplateFolderPath { get => _configuration.TemplateFolderPath; set => Set(value, nameof(TemplateFolderPath)); }
+        public bool UseOwnGuidsForMapFertilityGeneration { get => _configuration.UseOwnGuidsForMapFertilityGeneration; set => Set(value, nameof(UseOwnGuidsForMapFertilityGeneration)); }
         public string? CustomIslandGuid { get => _configuration.CustomIslandGuid; set => Set(value, nameof(CustomIslandGuid)); }
         public string? AssetsHash { get => _configuration.AssetsHash; set => Set(value, nameof(AssetsHash)); }
         public string? Xpath { get => _configuration.Xpath; set => Set(value, nameof(Xpath)); }
@@ -166,6 +167,7 @@ namespace AnnoMapEditor.Utilities
         public bool EnableExpertMode { get; set; }
         public string? CustomIslandsPath { get; set; }
         public string? TemplateFolderPath { get; set; }
+        public bool UseOwnGuidsForMapFertilityGeneration { get; set; } = false;
         [JsonProperty("Guid")]
         public string? CustomIslandGuid { get; set; }
         public string? AssetsHash { get; set; }

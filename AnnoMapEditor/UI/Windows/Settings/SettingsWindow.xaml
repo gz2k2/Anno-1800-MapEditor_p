@@ -254,26 +254,85 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
-                    <TextBlock Grid.Row="0"
-                               Text="GUID"
+                    <CheckBox x:Name="UseOwnGuidsForMapFertilityGenerationCheckBox"
+                              Grid.Row="0"
+                              Margin="0,0,0,14"
+                              HorizontalAlignment="Left"
+                              Foreground="{StaticResource ForegroundBrush}"
+                              Content="Use GUIDs for Map Fertility Generation"
+                              IsChecked="{Binding UseOwnGuidsForMapFertilityGeneration, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                        <CheckBox.Style>
+                            <Style TargetType="{x:Type CheckBox}">
+                                <Setter Property="MinHeight" Value="28" />
+                                <Setter Property="Focusable" Value="True" />
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="{x:Type CheckBox}">
+                                            <Grid Background="Transparent">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="22" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+                                                <Border x:Name="OwnGuidBox"
+                                                        Width="18" Height="18"
+                                                        VerticalAlignment="Center"
+                                                        Background="#FF252525"
+                                                        BorderBrush="#FFCCCCCC"
+                                                        BorderThickness="1"
+                                                        CornerRadius="2">
+                                                    <Path x:Name="OwnGuidCheck"
+                                                          Visibility="Collapsed"
+                                                          Data="M 3,8 L 7,12 L 14,4"
+                                                          Stroke="White"
+                                                          StrokeThickness="2" />
+                                                </Border>
+                                                <ContentPresenter Grid.Column="1"
+                                                                  Margin="8,0,0,0"
+                                                                  VerticalAlignment="Center"
+                                                                  RecognizesAccessKey="True" />
+                                            </Grid>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsChecked" Value="True">
+                                                    <Setter TargetName="OwnGuidCheck" Property="Visibility" Value="Visible" />
+                                                    <Setter TargetName="OwnGuidBox" Property="Background" Value="#FF2673B8" />
+                                                </Trigger>
+                                                <Trigger Property="IsKeyboardFocused" Value="True">
+                                                    <Setter TargetName="OwnGuidBox" Property="BorderBrush" Value="#FF66BFFF" />
+                                                </Trigger>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="OwnGuidBox" Property="BorderBrush" Value="#FF66BFFF" />
+                                                </Trigger>
+                                                <Trigger Property="IsEnabled" Value="False">
+                                                    <Setter Property="Opacity" Value="0.5" />
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </CheckBox.Style>
+                    </CheckBox>
+                    <TextBlock Grid.Row="1"
+                               Text="GUID Start"
                                Style="{StaticResource DefaultLabelStyle}" />
                     <TextBox x:Name="CustomIslandGuidTextBox"
-                             Grid.Row="1"
+                             Grid.Row="2"
                              Width="320"
                              HorizontalAlignment="Left"
                              Margin="0,5,0,10"
                              Text="{Binding CustomIslandGuid, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              PreviewTextInput="GuidTextBox_PreviewTextInput"
                              DataObject.Pasting="GuidTextBox_Pasting" />
-                    <TextBlock Grid.Row="2"
+                    <TextBlock Grid.Row="3"
                                MaxWidth="700"
                                HorizontalAlignment="Left"
                                TextWrapping="Wrap"
                                Style="{StaticResource DefaultLabelStyle}"
                                Text="For custom islands, up to 25 GUIDs are reserved for each supported session or Old World map variant. Nine separate ranges are used, reserving 225 GUIDs in total. These GUIDs are used to integrate the custom maps into the game so that fertilities and slots can be assigned." />
-                    <TextBlock Grid.Row="3"
+                    <TextBlock Grid.Row="4"
                                MaxWidth="700"
                                HorizontalAlignment="Left"
                                Margin="0,14,0,0"

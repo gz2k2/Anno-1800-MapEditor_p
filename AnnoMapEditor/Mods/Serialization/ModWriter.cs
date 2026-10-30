@@ -284,7 +284,7 @@ namespace AnnoMapEditor.Mods.Serialization
             }
 
             IReadOnlyList<IslandAsset> customIslands = GetCustomIslands(mod.MapTemplate);
-            if (customIslands.Count > 0)
+            if (Settings.Instance.UseOwnGuidsForMapFertilityGeneration && customIslands.Count > 0)
             {
                 long rangeStart = GetCustomIslandGuidRangeStart(mod.MapTemplate.Session, mod.MapType);
                 string islandRegion = GetIslandRegionId(mod.MapTemplate.Session);
