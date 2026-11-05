@@ -223,6 +223,28 @@ namespace AnnoMapEditor.UI.Windows.Main
             else
                 MapTemplate = await mapTemplateReader.FromFileAsync(a7tinfoPath);
 
+            var missingIslandFiles = MapTemplate.Elements
+                .OfType<FixedIslandElement>()
+                .Where(island => island.IsIslandFileMissing)
+                .Select(island => island.MissingIslandFilePath!)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(path => path, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            if (missingIslandFiles.Count > 0)
+            {
+                string missingList = string.Join(Environment.NewLine, missingIslandFiles.Select(path => $"- {path}"));
+                MessageBox.Show(
+                    $"The map template was loaded, but {missingIslandFiles.Count} island file(s) could not be found:
+
+{missingList}
+
+Missing islands are marked with a red outline on the map.",
+                    "Missing Island Files",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            }
+
             // TODO: Find a better solution for this "Hack"
             ToolbarService.Instance.ButtonClick(ToolbarButtonType.ZoomReset);
         }

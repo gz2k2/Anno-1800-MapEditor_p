@@ -15,6 +15,7 @@ namespace AnnoMapEditor.Utilities
         private readonly EditorConfiguration _configuration;
         public static Settings Instance { get; } = new();
         public ObservableCollection<MapPackage> MapPackages { get; } = new();
+        public ObservableCollection<MapPackage> StandaloneMapPackages { get; } = new();
         public string ConfigPath => Path.Combine(AppContext.BaseDirectory, ConfigFileName);
 
         public bool Quickstart { get => _configuration.Quickstart; set => Set(value, nameof(Quickstart)); }
@@ -50,11 +51,14 @@ namespace AnnoMapEditor.Utilities
         {
             _configuration = LoadConfiguration();
             foreach (MapPackage package in _configuration.MapPackages) MapPackages.Add(package);
+            foreach (MapPackage package in _configuration.StandaloneMapPackages) StandaloneMapPackages.Add(package);
             if (MapPackages.Count == 0 && !string.IsNullOrWhiteSpace(CustomIslandsPath))
                 MapPackages.Add(new MapPackage { Name = "Migrated package", CustomMapFolder = CustomIslandsPath });
             EnsureTwoCharacterPackageIds();
             MapPackages.CollectionChanged += MapPackages_CollectionChanged;
             foreach (MapPackage package in MapPackages) package.PropertyChanged += MapPackage_PropertyChanged;
+            StandaloneMapPackages.CollectionChanged += StandaloneMapPackages_CollectionChanged;
+            foreach (MapPackage package in StandaloneMapPackages) package.PropertyChanged += StandaloneMapPackage_PropertyChanged;
             if (GamePath == null) _configuration.GamePath = GetInstallDirFromRegistry();
             Save();
         }
@@ -142,11 +146,19 @@ namespace AnnoMapEditor.Utilities
             if (packagesNeedingId.Count > 0)
                 throw new InvalidOperationException("No free two-character map package ID is available.");
         }
+        private void StandaloneMapPackages_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.OldItems != null) foreach (MapPackage package in e.OldItems) package.PropertyChanged -= StandaloneMapPackage_PropertyChanged;
+            if (e.NewItems != null) foreach (MapPackage package in e.NewItems) package.PropertyChanged += StandaloneMapPackage_PropertyChanged;
+            Save();
+        }
+        private void StandaloneMapPackage_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) => Save();
         private void MapPackage_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) => Save();
         public void SaveMapPackages() => Save();
         private void Save()
         {
             _configuration.MapPackages = new Collection<MapPackage>(MapPackages);
+            _configuration.StandaloneMapPackages = new Collection<MapPackage>(StandaloneMapPackages);
             File.WriteAllText(ConfigPath, JsonConvert.SerializeObject(_configuration, Formatting.Indented));
         }
 
@@ -173,5 +185,6 @@ namespace AnnoMapEditor.Utilities
         public string? AssetsHash { get; set; }
         public string? Xpath { get; set; }
         public Collection<MapPackage> MapPackages { get; set; } = new();
+        public Collection<MapPackage> StandaloneMapPackages { get; set; } = new();
     }
 }

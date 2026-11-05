@@ -18,6 +18,8 @@ namespace AnnoMapEditor.UI.Windows.Configuration
             packagesView.SortDescriptions.Add(new SortDescription(nameof(MapPackage.Name), ListSortDirection.Ascending));
             if (packagesView is ICollectionViewLiveShaping liveShaping && liveShaping.CanChangeLiveSorting)
                 liveShaping.IsLiveSorting = true;
+            ICollectionView standalonePackagesView = CollectionViewSource.GetDefaultView(Settings.Instance.StandaloneMapPackages);
+            standalonePackagesView.SortDescriptions.Add(new SortDescription(nameof(MapPackage.Name), ListSortDirection.Ascending));
         }
 
         private void SelectGamePath_Click(object sender, RoutedEventArgs e)
@@ -89,6 +91,15 @@ namespace AnnoMapEditor.UI.Windows.Configuration
                 package.CustomFilesFolder = picker.SelectedPath;
         }
 
+        private void AddMapPackage_Click(object sender, RoutedEventArgs e) { MapPackage package = new(); Settings.Instance.StandaloneMapPackages.Add(package); MapPackagesGrid.SelectedItem = package; }
+        private void DeleteMapPackage_Click(object sender, RoutedEventArgs e) { if (MapPackagesGrid.SelectedItem is MapPackage package) Settings.Instance.StandaloneMapPackages.Remove(package); }
+        private async void SelectMapPackageFolder_Click(object sender, RoutedEventArgs e)
+        {
+            if (MapPackagesGrid.SelectedItem is not MapPackage package) return;
+            VistaFolderBrowserDialog picker = new() { UseDescriptionForTitle = true, Description = "Select the exported Map Package folder", SelectedPath = package.CustomMapFolder };
+            if (true == picker.ShowDialog(this)) { package.CustomMapFolder = picker.SelectedPath; await CustomIslandCatalog.Instance.RefreshAsync(); }
+        }
+
         private static bool IsDigitsOnly(string value) => Regex.IsMatch(value, @"^[0-9]*$");
 
         private void GuidTextBox_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
@@ -114,6 +125,7 @@ namespace AnnoMapEditor.UI.Windows.Configuration
             Settings.Instance.CustomIslandGuid = CustomIslandGuidTextBox.Text;
 
             PackagesGrid.CommitEdit();
+            MapPackagesGrid.CommitEdit();
             Settings.Instance.SaveMapPackages();
             await CustomIslandCatalog.Instance.RefreshAsync();
             Close();

@@ -51,6 +51,8 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         }
         private SolidColorBrush _borderBrush = BorderBrushes["Normal"];
 
+        public bool IsIslandFileMissing => Island is FixedIslandElement fixedIsland && fixedIsland.IsIslandFileMissing;
+
         public bool IsOutOfBounds
         {
             get => _isOutOfBounds;

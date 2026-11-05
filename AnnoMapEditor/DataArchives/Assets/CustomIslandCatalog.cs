@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace AnnoMapEditor.DataArchives.Assets
 {
@@ -30,9 +31,70 @@ namespace AnnoMapEditor.DataArchives.Assets
             };
         }
 
+
+        /// <summary>Loads exported Map Package islands from their assets.xml while preserving their original game-relative paths.</summary>
+        private async Task LoadMapPackageAsync(MapPackage package)
+        {
+            string root = Path.GetFullPath(package.CustomMapFolder);
+            foreach (string assetsPath in Directory.EnumerateFiles(root, "assets.xml", SearchOption.AllDirectories))
+            {
+                XDocument document;
+                try { document = XDocument.Load(assetsPath); }
+                catch (Exception ex) { DataManager._logger.LogWarning($"Could not parse Map Package assets.xml '{assetsPath}': {ex.Message}"); continue; }
+
+                foreach (XElement assetElement in document.Descendants("Asset"))
+                {
+                    XElement? randomIsland = assetElement.Element("Values")?.Element("RandomIsland");
+                    string? filePath = randomIsland?.Element("FilePath")?.Value?.Trim();
+                    if (string.IsNullOrWhiteSpace(filePath) || !filePath.EndsWith(".a7m", StringComparison.OrdinalIgnoreCase))
+                        continue;
+
+                    string normalizedFilePath = filePath.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar);
+                    string sourceA7m = Path.GetFullPath(Path.Combine(root, normalizedFilePath));
+                    if (!sourceA7m.StartsWith(root, StringComparison.OrdinalIgnoreCase) || !File.Exists(sourceA7m) || !File.Exists(Path.ChangeExtension(sourceA7m, ".a7minfo")))
+                        continue;
+
+                    try
+                    {
+                        FixedIslandRepository reader = new(new FolderDataArchive(root));
+                        FixedIslandAsset fixedIsland = await reader.LoadIslandAssetAsync(normalizedFilePath);
+                        AssetRepository? assetRepository = DataManager.Instance.IsInitialized ? DataManager.Instance.AssetRepository : null;
+                        foreach (Slot slot in fixedIsland.Slots.Values)
+                        {
+                            if (assetRepository != null && assetRepository.TryGet(slot.ObjectGuid, out SlotAsset? slotAsset)) slot.SlotAsset = slotAsset;
+                            else slot.SlotAsset = new SlotAsset { GUID = slot.ObjectGuid, DisplayName = $"Slot {slot.ObjectGuid}" };
+                        }
+
+                        string displayName = assetElement.Element("Values")?.Element("Standard")?.Element("Name")?.Value?.Trim()
+                            ?? Path.GetFileNameWithoutExtension(sourceA7m);
+                        IslandAsset island = new()
+                        {
+                            FilePath = filePath.Replace('/', '\\'),
+                            CustomSourceDirectory = Path.GetDirectoryName(sourceA7m),
+                            CustomPackageName = package.Name,
+                            IsExternalMapPackageIsland = true,
+                            DisplayName = displayName,
+                            Thumbnail = fixedIsland.Thumbnail,
+                            Region = RegionAsset.DetectFromPath(filePath) ?? RegionAsset.CreateTestRegion(),
+                            IslandDifficulty = new[] { IslandDifficulty.Normal },
+                            IslandType = new[] { IslandType.Normal },
+                            IslandSize = new[] { IslandSize.All.FirstOrDefault(size => fixedIsland.SizeInTiles <= size.DefaultSizeInTiles)! },
+                            SizeInTiles = fixedIsland.SizeInTiles,
+                            Slots = fixedIsland.Slots
+                        };
+                        Islands.Add(island);
+                        if (DataManager.Instance.IsInitialized) DataManager.Instance.IslandRepository.AddCustomIsland(island);
+                    }
+                    catch (Exception ex) { DataManager._logger.LogWarning($"Could not load Map Package island '{sourceA7m}': {ex.Message}"); }
+                }
+            }
+        }
+
         public async Task RefreshAsync()
         {
             Islands.Clear();
+            foreach (MapPackage package in Settings.Instance.StandaloneMapPackages.Where(package => Directory.Exists(package.CustomMapFolder)))
+                await LoadMapPackageAsync(package);
             // Search recursively: creators commonly group islands by region or author below the
             // configured root. An island is identified by its a7m and matching sidecars, not by
             // the name of its parent directory.

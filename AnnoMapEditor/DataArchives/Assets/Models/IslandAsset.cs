@@ -36,5 +36,8 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
 
         /// <summary>Name of the map package this custom island belongs to.</summary>
         public string? CustomPackageName { get; init; }
+
+        /// <summary>True when the island comes from an installed Map Package and must not be copied or regenerated during export.</summary>
+        public bool IsExternalMapPackageIsland { get; init; }
     }
 }

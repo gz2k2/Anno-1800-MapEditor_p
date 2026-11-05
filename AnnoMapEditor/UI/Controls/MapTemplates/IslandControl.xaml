@@ -112,6 +112,15 @@
             </Viewbox>
         </Grid>
 
+        <!-- Missing island file marker -->
+        <Rectangle Visibility="{Binding IsIslandFileMissing, Converter={StaticResource VisibleOnTrue}}"
+                   Width="{Binding Island.SizeInTiles}"
+                   Height="{Binding Island.SizeInTiles}"
+                   Stroke="#FFFF2020"
+                   StrokeThickness="12"
+                   Fill="#24FF2020"
+                   IsHitTestVisible="False" />
+
         <!-- Cross Out -->
         <Grid Visibility="{Binding IsOutOfBounds, Converter={StaticResource VisibleOnTrue}}">
             <Line

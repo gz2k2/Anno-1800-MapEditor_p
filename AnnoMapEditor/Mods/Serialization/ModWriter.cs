@@ -177,7 +177,7 @@ namespace AnnoMapEditor.Mods.Serialization
             IEnumerable<IslandAsset> customIslands = mapTemplate.Elements
                 .OfType<FixedIslandElement>()
                 .Select(element => element.IslandAsset)
-                .Where(asset => !string.IsNullOrWhiteSpace(asset.CustomSourceDirectory))
+                .Where(asset => !asset.IsExternalMapPackageIsland && !string.IsNullOrWhiteSpace(asset.CustomSourceDirectory))
                 .GroupBy(asset => asset.FilePath, StringComparer.OrdinalIgnoreCase)
                 .Select(group => group.First());
 
@@ -322,7 +322,7 @@ namespace AnnoMapEditor.Mods.Serialization
             return mapTemplate.Elements
                 .OfType<FixedIslandElement>()
                 .Select(element => element.IslandAsset)
-                .Where(asset => !string.IsNullOrWhiteSpace(asset.CustomSourceDirectory))
+                .Where(asset => !asset.IsExternalMapPackageIsland && !string.IsNullOrWhiteSpace(asset.CustomSourceDirectory))
                 .GroupBy(asset => asset.FilePath, StringComparer.OrdinalIgnoreCase)
                 .Select(group => group.First())
                 .OrderBy(asset => asset.FilePath, StringComparer.OrdinalIgnoreCase)

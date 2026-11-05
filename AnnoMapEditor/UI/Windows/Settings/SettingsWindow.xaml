@@ -150,7 +150,7 @@
                 </Grid>
             </TabItem>
 
-            <TabItem Header="Map packages">
+            <TabItem Header="Custom Maps">
                 <Grid Margin="18">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -164,7 +164,7 @@
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="Map packages"
+                        <TextBlock Text="Custom Maps"
                                    Style="{StaticResource DefaultLabelStyle}"
                                    VerticalAlignment="Center" />
                         <Button Grid.Column="1"
@@ -245,6 +245,99 @@
                                 Margin="0,0,10,0" />
                         <Button Content="Select files folder..."
                                 Click="SelectCustomFilesFolder_Click" />
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Island Packages">
+                <Grid Margin="18">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0" Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Island Packages"
+                                   Style="{StaticResource DefaultLabelStyle}"
+                                   VerticalAlignment="Center" />
+                        <Button Grid.Column="1"
+                                Content="+ New package"
+                                Click="AddMapPackage_Click"
+                                Margin="0,0,10,0" />
+                        <Button Grid.Column="2"
+                                Content="Delete selected"
+                                Click="DeleteMapPackage_Click" />
+                    </Grid>
+
+                    <DataGrid x:Name="MapPackagesGrid"
+                              Grid.Row="1"
+                              ItemsSource="{Binding StandaloneMapPackages}"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False"
+                              SelectionMode="Single"
+                              SelectionUnit="FullRow"
+                              HeadersVisibility="Column"
+                              GridLinesVisibility="Horizontal"
+                              Margin="0,0,0,12">
+                        <DataGrid.Resources>
+                            <Style TargetType="{x:Type DataGrid}">
+                                <Setter Property="Background" Value="{StaticResource DarkBackgroundBrush}" />
+                                <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
+                                <Setter Property="BorderBrush" Value="{StaticResource BrightBorderBrush}" />
+                                <Setter Property="RowBackground" Value="{StaticResource MediumBackgroundBrush}" />
+                                <Setter Property="AlternatingRowBackground" Value="{StaticResource DarkBackgroundBrush}" />
+                            </Style>
+                            <Style TargetType="{x:Type DataGridColumnHeader}">
+                                <Setter Property="Background" Value="{StaticResource MediumBackgroundBrush}" />
+                                <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
+                                <Setter Property="BorderBrush" Value="{StaticResource BrightBorderBrush}" />
+                                <Setter Property="Padding" Value="6" />
+                            </Style>
+                            <Style TargetType="{x:Type DataGridCell}">
+                                <Setter Property="Background" Value="Transparent" />
+                                <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
+                                <Setter Property="BorderThickness" Value="0" />
+                                <Setter Property="Padding" Value="5" />
+                            </Style>
+                            <Style TargetType="{x:Type DataGridRow}">
+                                <Setter Property="Background" Value="{StaticResource MediumBackgroundBrush}" />
+                                <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="{StaticResource MouseoverBackgroundBrush}" />
+                                    </Trigger>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="Background" Value="{StaticResource SelectedBackgroundBrush}" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                            <Style TargetType="{x:Type DataGridRowHeader}">
+                                <Setter Property="Background" Value="{StaticResource MediumBackgroundBrush}" />
+                                <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
+                                <Setter Property="BorderBrush" Value="{StaticResource BrightBorderBrush}" />
+                            </Style>
+                        </DataGrid.Resources>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Package Name"
+                                                Binding="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
+                                                Width="160" />
+                            <DataGridTextColumn Header="Package Folder"
+                                                Binding="{Binding CustomMapFolder, UpdateSourceTrigger=PropertyChanged}"
+                                                Width="*" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <StackPanel Grid.Row="2"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Right">
+                        <Button Content="Select Island Package Folder..."
+                                Click="SelectMapPackageFolder_Click"
+                                Margin="0" />
                     </StackPanel>
                 </Grid>
             </TabItem>

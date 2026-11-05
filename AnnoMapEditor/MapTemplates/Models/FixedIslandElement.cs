@@ -35,6 +35,10 @@ namespace AnnoMapEditor.MapTemplates.Models
         }
         private IslandAsset _islandAsset;
 
+        /// <summary>The unresolved map file path when the template references an unavailable island.</summary>
+        public string? MissingIslandFilePath { get; private set; }
+        public bool IsIslandFileMissing => !string.IsNullOrWhiteSpace(MissingIslandFilePath);
+
 
         public bool RandomizeRotation
         {
@@ -182,7 +186,21 @@ namespace AnnoMapEditor.MapTemplates.Models
                 islandAsset = repositoryIsland;
 
             if (islandAsset == null)
-                throw new NullReferenceException($"Unknown island '{islandFilePath}'.");
+            {
+                MissingIslandFilePath = islandFilePath;
+                _logger.LogWarning($"Unknown island '{islandFilePath}'. A placeholder will be displayed.");
+                islandAsset = new IslandAsset
+                {
+                    FilePath = islandFilePath,
+                    DisplayName = System.IO.Path.GetFileNameWithoutExtension(islandFilePath) + " (missing)",
+                    Region = RegionAsset.DetectFromPath(islandFilePath) ?? RegionAsset.CreateTestRegion(),
+                    IslandDifficulty = new[] { IslandDifficulty.Normal },
+                    IslandType = new[] { IslandType.Normal },
+                    IslandSize = new[] { IslandSize.All.First() },
+                    SizeInTiles = 128,
+                    Slots = new Dictionary<long, Slot>()
+                };
+            }
 
             IslandAsset = islandAsset;
             //Rotation is not asset bound, thus loaded in constructor
