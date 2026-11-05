@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version>0.7.89</Version>
+    <Version>0.7.90</Version>
     <FileVersion>$(Version)</FileVersion>
     <InformationalVersion>v$(Version) - modified by gz2k2</InformationalVersion>
     <OutputType>WinExe</OutputType>

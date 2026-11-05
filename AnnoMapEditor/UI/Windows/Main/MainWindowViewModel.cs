@@ -15,6 +15,7 @@ using AnnoMapEditor.Utilities.UndoRedo;
 using Microsoft.Win32;
 using System.IO;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using AnnoMapEditor.UI.Controls.Toolbar;
@@ -235,11 +236,7 @@ namespace AnnoMapEditor.UI.Windows.Main
             {
                 string missingList = string.Join(Environment.NewLine, missingIslandFiles.Select(path => $"- {path}"));
                 MessageBox.Show(
-                    $"The map template was loaded, but {missingIslandFiles.Count} island file(s) could not be found:
-
-{missingList}
-
-Missing islands are marked with a red outline on the map.",
+                    $"The map template was loaded, but {missingIslandFiles.Count} island file(s) could not be found:{Environment.NewLine}{Environment.NewLine}{missingList}{Environment.NewLine}{Environment.NewLine}Missing islands are marked with a red outline on the map.",
                     "Missing Island Files",
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);

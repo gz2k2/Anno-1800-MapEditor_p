@@ -1,8 +1,6 @@
 ## Anno 1800 Map Editor modified by gz2k2
 
-### v0.7.89
+### v0.7.90
 
 ### Added
-- **Settings**: Added a checkbox option for using GUIDs on custom maps. 
-  - *Checked*: GUIDs are used for random fertility generation.
-  - *Unchecked*: GUIDs are omitted for random fertility generation.
+- Island Packages created with "Anno Island Package Creator" ( https://github.com/gz2k2/Anno_Map_Package_Creator ) are now supported
