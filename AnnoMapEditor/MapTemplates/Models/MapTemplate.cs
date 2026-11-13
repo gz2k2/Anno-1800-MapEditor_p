@@ -1,4 +1,5 @@
-﻿using Anno.FileDBModels.Anno1800.MapTemplate;
+using Anno.FileDBModels.Anno1800.MapTemplate;
+using AnnoMapEditor.DataArchives;
 using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.Utilities;
 using System;
@@ -83,16 +84,27 @@ namespace AnnoMapEditor.MapTemplates.Models
             _playableArea = new Rect2(document.MapTemplate?.PlayableArea);
             _templateDocument = document;
 
-            // TODO: Allow empty templates?
             int startingSpotCounter = 0;
-            foreach (TemplateElement elementTemplate in document.MapTemplate!.TemplateElement!)
+            if (document.MapTemplate?.TemplateElement != null)
             {
-                MapElement element = MapElement.FromTemplate(elementTemplate);
+                foreach (TemplateElement elementTemplate in document.MapTemplate.TemplateElement)
+                {
+                    try
+                    {
+                        MapElement? element = MapElement.FromTemplate(elementTemplate);
+                        if (element != null)
+                        {
+                            if (element is StartingSpotElement startingSpot)
+                                startingSpot.Index = startingSpotCounter++;
 
-                if (element is StartingSpotElement startingSpot)
-                    startingSpot.Index = startingSpotCounter++;
-
-                Elements.Add(element);
+                            Elements.Add(element);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        DataManager._logger.LogWarning($"Skipped corrupted template element: {ex.Message}");
+                    }
+                }
             }
 
             // clear links in the original

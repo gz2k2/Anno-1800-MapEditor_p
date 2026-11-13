@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
 using System.Windows;
@@ -25,6 +25,16 @@ namespace AnnoMapEditor
         }
 
         public App() {
+            DispatcherUnhandledException += (sender, e) =>
+            {
+                e.Handled = true;
+                MessageBox.Show(
+                    $"An unexpected error occurred:\n\n{e.Exception.Message}\n\nDetails:\n{e.Exception}",
+                    TitleShort,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            };
+
             ResxLocalizationProvider provider = ResxLocalizationProvider.Instance;
 
             provider.SearchCultures = new List<System.Globalization.CultureInfo>()

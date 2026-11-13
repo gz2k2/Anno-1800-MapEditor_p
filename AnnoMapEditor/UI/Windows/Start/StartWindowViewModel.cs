@@ -1,11 +1,13 @@
-﻿using AnnoMapEditor.DataArchives;
+using AnnoMapEditor.DataArchives;
 using AnnoMapEditor.DataArchives.Assets;
 using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.MapTemplates.Serializing;
 using AnnoMapEditor.UI.Windows.Main;
 using AnnoMapEditor.Utilities;
 using Microsoft.Win32;
+using System;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace AnnoMapEditor.UI.Windows.Start
@@ -54,19 +56,30 @@ namespace AnnoMapEditor.UI.Windows.Start
 
         public async Task OpenMap(string a7tinfoPath, bool fromArchive = false)
         {
-            await CustomIslandCatalog.Instance.RefreshAsync();
-            MapTemplateReader mapTemplateReader = new();
-            MapTemplate mapTemplate;
+            try
+            {
+                await CustomIslandCatalog.Instance.RefreshAsync();
+                MapTemplateReader mapTemplateReader = new();
+                MapTemplate mapTemplate;
 
-            if (fromArchive)
-                mapTemplate = await mapTemplateReader.FromDataArchiveAsync(a7tinfoPath);
+                if (fromArchive)
+                    mapTemplate = await mapTemplateReader.FromDataArchiveAsync(a7tinfoPath);
+                else
+                    mapTemplate = await mapTemplateReader.FromFileAsync(a7tinfoPath);
 
-            else
-                mapTemplate = await mapTemplateReader.FromFileAsync(a7tinfoPath);
+                MainWindow mainWindow = new(new MainWindowViewModel(mapTemplate));
 
-            MainWindow mainWindow = new(new MainWindowViewModel(mapTemplate));
-
-            ContinueToMainWindow();
+                ContinueToMainWindow();
+            }
+            catch (Exception ex)
+            {
+                DataManager._logger.LogError($"Failed to load map template '{a7tinfoPath}'.", ex);
+                MessageBox.Show(
+                    $"The map template could not be loaded:\n\n{a7tinfoPath}\n\nReason:\n{ex.Message}",
+                    "Error loading map template",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
         }
 
         public void NewMap()

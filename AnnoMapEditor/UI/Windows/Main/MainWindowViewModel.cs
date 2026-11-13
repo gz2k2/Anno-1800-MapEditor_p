@@ -214,36 +214,47 @@ namespace AnnoMapEditor.UI.Windows.Main
 
         public async Task OpenMap(string a7tinfoPath, bool fromArchive = false)
         {
-            await CustomIslandCatalog.Instance.RefreshAsync();
-            MapTemplateFilePath = Path.GetFileName(a7tinfoPath);
-            MapTemplateReader mapTemplateReader = new();
-
-            if (fromArchive)
-                MapTemplate = await mapTemplateReader.FromDataArchiveAsync(a7tinfoPath);
-
-            else
-                MapTemplate = await mapTemplateReader.FromFileAsync(a7tinfoPath);
-
-            var missingIslandFiles = MapTemplate.Elements
-                .OfType<FixedIslandElement>()
-                .Where(island => island.IsIslandFileMissing)
-                .Select(island => island.MissingIslandFilePath!)
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .OrderBy(path => path, StringComparer.OrdinalIgnoreCase)
-                .ToList();
-
-            if (missingIslandFiles.Count > 0)
+            try
             {
-                string missingList = string.Join(Environment.NewLine, missingIslandFiles.Select(path => $"- {path}"));
-                MessageBox.Show(
-                    $"The map template was loaded, but {missingIslandFiles.Count} island file(s) could not be found:{Environment.NewLine}{Environment.NewLine}{missingList}{Environment.NewLine}{Environment.NewLine}Missing islands are marked with a red outline on the map.",
-                    "Missing Island Files",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-            }
+                await CustomIslandCatalog.Instance.RefreshAsync();
+                MapTemplateFilePath = Path.GetFileName(a7tinfoPath);
+                MapTemplateReader mapTemplateReader = new();
 
-            // TODO: Find a better solution for this "Hack"
-            ToolbarService.Instance.ButtonClick(ToolbarButtonType.ZoomReset);
+                if (fromArchive)
+                    MapTemplate = await mapTemplateReader.FromDataArchiveAsync(a7tinfoPath);
+                else
+                    MapTemplate = await mapTemplateReader.FromFileAsync(a7tinfoPath);
+
+                var missingIslandFiles = MapTemplate.Elements
+                    .OfType<FixedIslandElement>()
+                    .Where(island => island.IsIslandFileMissing)
+                    .Select(island => island.MissingIslandFilePath!)
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .OrderBy(path => path, StringComparer.OrdinalIgnoreCase)
+                    .ToList();
+
+                if (missingIslandFiles.Count > 0)
+                {
+                    string missingList = string.Join(Environment.NewLine, missingIslandFiles.Select(path => $"- {path}"));
+                    MessageBox.Show(
+                        $"The map template was loaded, but {missingIslandFiles.Count} island file(s) could not be found:{Environment.NewLine}{Environment.NewLine}{missingList}{Environment.NewLine}{Environment.NewLine}Missing islands are marked with a red outline on the map.",
+                        "Missing Island Files",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+                }
+
+                // TODO: Find a better solution for this "Hack"
+                ToolbarService.Instance.ButtonClick(ToolbarButtonType.ZoomReset);
+            }
+            catch (Exception ex)
+            {
+                DataManager._logger.LogError($"Failed to load map template '{a7tinfoPath}'.", ex);
+                MessageBox.Show(
+                    $"The map template could not be loaded:\n\n{a7tinfoPath}\n\nReason:\n{ex.Message}",
+                    "Error loading map template",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
         }
 
         public void CreateNewMap()

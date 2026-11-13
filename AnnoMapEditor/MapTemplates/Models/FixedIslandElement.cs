@@ -151,8 +151,7 @@ namespace AnnoMapEditor.MapTemplates.Models
         {
             _sourceElement = sourceElement;
 
-            string islandFilePath = sourceElement.MapFilePath
-                ?? throw new ArgumentException($"Missing property '{nameof(Element.MapFilePath)}'.");
+            string islandFilePath = sourceElement.MapFilePath ?? "unknown_island.a7m";
 
             _randomizeRotation = sourceElement.Rotation90 == null;
             _rotation = sourceElement.Rotation90;
@@ -175,8 +174,7 @@ namespace AnnoMapEditor.MapTemplates.Models
         [MemberNotNull(nameof(_islandAsset))]
         private void LoadIslandDataFromRepository(Element sourceElement)
         {
-            string islandFilePath = sourceElement.MapFilePath
-                ?? throw new ArgumentException($"Missing property '{nameof(Element.MapFilePath)}'.");
+            string islandFilePath = sourceElement.MapFilePath ?? "unknown_island.a7m";
 
             IslandAsset? islandAsset = CustomIslandCatalog.Instance.Islands
                 .FirstOrDefault(i => i.FilePath == islandFilePath);

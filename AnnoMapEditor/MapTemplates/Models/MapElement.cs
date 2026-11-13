@@ -1,4 +1,4 @@
-﻿using Anno.FileDBModels.Anno1800.MapTemplate;
+using Anno.FileDBModels.Anno1800.MapTemplate;
 using AnnoMapEditor.MapTemplates.Enums;
 using AnnoMapEditor.Utilities;
 using System;
@@ -25,12 +25,18 @@ namespace AnnoMapEditor.MapTemplates.Models
 
         public MapElement(Element element)
         {
-            _position = new Vector2(element.Position![1], element.Position![0]);
+            if (element.Position != null && element.Position.Length >= 2)
+                _position = new Vector2(element.Position[1], element.Position[0]);
+            else
+                _position = Vector2.Zero;
         }
 
-        public static MapElement FromTemplate(TemplateElement templateElement)
+        public static MapElement? FromTemplate(TemplateElement templateElement)
         {
-            Element element = templateElement.Element!;
+            Element? element = templateElement.Element;
+            if (element == null)
+                return null;
+
             MapElementType elementType = MapElementType.FromElementValue(templateElement.ElementType);
 
             if (elementType == MapElementType.FixedIsland)
