@@ -36,11 +36,11 @@ namespace AnnoMapEditor.DataArchives.Assets
         private async Task LoadMapPackageAsync(MapPackage package)
         {
             string root = Path.GetFullPath(package.CustomMapFolder);
-            foreach (string assetsPath in Directory.EnumerateFiles(root, "assets.xml", SearchOption.AllDirectories))
+            foreach (string assetsPath in Directory.EnumerateFiles(root, "assets*.xml", SearchOption.AllDirectories))
             {
                 XDocument document;
                 try { document = XDocument.Load(assetsPath); }
-                catch (Exception ex) { DataManager._logger.LogWarning($"Could not parse Map Package assets.xml '{assetsPath}': {ex.Message}"); continue; }
+                catch (Exception ex) { DataManager._logger.LogWarning($"Could not parse Map Package assets*.xml '{assetsPath}': {ex.Message}"); continue; }
 
                 foreach (XElement assetElement in document.Descendants("Asset"))
                 {

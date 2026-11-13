@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -37,7 +37,6 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
             MinesFilter.ValueChanged += Filter_ValueChanged;
             OilFilter.ValueChanged += Filter_ValueChanged;
             GasFilter.ValueChanged += Filter_ValueChanged;
-            CustomFilter.ValueChanged += Filter_ValueChanged;
         }
 
 

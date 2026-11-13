@@ -1,4 +1,4 @@
-﻿using AnnoMapEditor.DataArchives.Assets.Models;
+using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.Utilities;
 using System;
@@ -164,7 +164,7 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
                 UpdateFilter();
             }
         }
-        private bool _showCustom = true;
+        private bool _showCustom = false;
 
         public bool NewWorldAllOres
         {
@@ -351,7 +351,7 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
                         _onChanged();
                 }
             }
-            private bool _isVisible = true;
+            private bool _isVisible;
 
             private readonly Action _onChanged;
 
@@ -359,6 +359,8 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
             {
                 Guid = guid;
                 _onChanged = onChanged;
+                // Unknown GUIDs (RANDOM_CUSTOM) default to hidden
+                _isVisible = SlotAsset.GetRandomSlotType(guid) != SlotAsset.RANDOM_CUSTOM;
             }
         }
 
